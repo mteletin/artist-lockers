@@ -1,0 +1,84 @@
+/* Current site only. Loaded after page styles; desktop and standalone editors are unchanged. */
+.submission-prerequisites { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; font-size:13px; }
+.submission-check { color:var(--text-muted); }
+.submission-check.is-ready { color:var(--text-primary); }
+.submission-draft-notice { padding:12px; margin-bottom:16px; border:1px solid var(--border-strong); color:var(--text-secondary); font-size:14px; }
+.submission-draft-notice button { margin:8px 8px 0 0; }
+@media (max-width: 768px) {
+  .artists-show-more { display:block; margin:20px auto 0; min-height:44px; }
+  .artists-show-more[hidden] { display:none; }
+  .artist-locale-region { font-size:12px; opacity:1; }
+  body:has(nav[data-site-navigation]) { --footer-clearance: 0px; padding-bottom: 0; }
+  body:has(nav[data-site-navigation]) footer {
+    position: static; min-height: 0; padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  body:has(nav[data-site-navigation]) .footer-links { flex-wrap: wrap; gap: 4px 14px; }
+  body:has(nav[data-site-navigation]) .footer-links a { display: inline-flex; align-items: center; min-height: 44px; }
+  nav[data-site-navigation] :is(.nav-logo, .nav-profile, .nav-logout, .nav-login) { min-height: 44px; align-content: center; }
+  nav[data-site-navigation] .nav-hamburger { min-width: 44px; min-height: 44px; justify-content: center; }
+
+  /* A compact, horizontally scrollable section strip replaces the tall vertical labels. */
+  :is(#accountTabBar, #adminTabBar) {
+    height: auto; min-height: 52px; padding: 4px 8px; gap: 6px;
+    overflow-x: auto; overflow-y: hidden; scrollbar-width: thin;
+    scroll-padding-inline: 8px; align-items: stretch;
+  }
+  :is(#accountTabBar, #adminTabBar) .admin-tab {
+    flex: 0 0 auto; width: auto; min-width: 0; height: auto; min-height: 44px;
+    margin-left: 0; transform: skewX(-6deg);
+  }
+  :is(#accountTabBar, #adminTabBar) .admin-tab-title {
+    display: block; font: 500 13px/1.3 'Outfit', sans-serif;
+    letter-spacing: .5px; padding: 12px 14px; transform: skewX(6deg);
+  }
+  :is(#accountTabBar, #adminTabBar) .admin-tab-vertical { display: none; }
+  .workspace-tab-hint { font-size: 11px; color: var(--text-muted); margin: 0 0 8px; }
+  .workspace-tab-hint[hidden] { display: none; }
+
+  /* Keep the excluded lore editor's own controls/layout untouched. */
+  .admin-tab-panel:not(#panelLore) :is(.admin-subtab-layout, .admin-subtab-content, .admin-layout, .admin-editor, .admin-preview) { min-width: 0; }
+  .admin-tab-panel:not(#panelLore) .admin-subtabs { min-width: 0; flex-wrap: wrap; gap: 6px; }
+  .admin-tab-panel:not(#panelLore) .admin-subtab { flex: 1 1 auto; min-width: 0; min-height: 44px; white-space: normal; letter-spacing: 1px; }
+  #panelCompetition .competition-grid { grid-template-columns: minmax(0, 1fr); }
+  #panelCompetition :is(.competition-card, .competition-card-head, .competition-qual) { min-width: 0; overflow-wrap: anywhere; }
+  #panelCompetition .competition-qual { flex-wrap: wrap; }
+  #panelProfile :is(.profile-main, .profile-form, .profile-url-row, .profile-url-actions) { min-width: 0; }
+  #panelProfile .profile-url-row { grid-template-columns: minmax(0, 1fr); }
+  #panelProfile .profile-url-actions { flex-direction: row; flex-wrap: wrap; }
+  #panelProfile .profile-url-actions > * { max-width: 100%; white-space: normal; }
+  :is(#panelTools, #panelAdminTools) :is(.h3-list, .h3-list-head, .h3-compose, .h3-field, .h3-advanced) { min-width: 0; }
+  :is(#panelTools, #panelAdminTools) .h3-list-head { flex-wrap: wrap; gap: 8px; }
+  #panelTools .h3-field--inline { flex-wrap: wrap; }
+  #panelTools .h3-advanced-grid { grid-template-columns: minmax(0, 1fr); }
+  #panelTools .h3-lists { grid-template-columns: minmax(0, 1fr); }
+
+  /* Readable text entry without increasing compact list labels. Exclude checkboxes/ranges. */
+  body:has(nav[data-site-navigation]) :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]), select, textarea):not(#panelLore *) {
+    font-size: 16px; min-width: 0; max-width: 100%;
+  }
+  .admin-tab-panel:not(#panelLore) :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]), select) { min-height: 44px; }
+  :is(#panelTools, #panelAdminTools) :is(input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea) {
+    font-family: inherit; color: var(--text-primary); background: var(--bg-input);
+    border: 1px solid var(--border-strong); border-radius: 2px; padding: 10px;
+  }
+  :is(#panelTools, #panelAdminTools) textarea { min-height: 100px; }
+  .admin-tab-panel:not(#panelLore) :is(button, .btn-ghost, .btn-primary, .btn-secondary, summary),
+  :is(.picker-modal, #accountUploadBackdrop, #accountEditBackdrop) button { min-width: 44px; min-height: 44px; }
+  #panelTools .h3-slot { width: 96px; height: 96px; }
+  .upload-modal-close { min-width: 44px; min-height: 44px; flex-shrink: 0; }
+  .picker-modal .upload-modal-header { flex-wrap: wrap; gap: 8px; padding: 16px 16px 0; }
+  .picker-modal .upload-modal-body { padding: 16px; }
+  .picker-header-actions { margin-left: auto; }
+  .asset-tag-btn { min-width: 44px; min-height: 44px; }
+  #panelProfile .profile-image-remove { min-width: 44px; }
+}
+@media (max-width: 360px) {
+  nav[data-site-navigation] { gap: 4px; }
+  nav[data-site-navigation] .nav-auth { gap: 4px; }
+  nav[data-site-navigation] .nav-profile { max-width: 58px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior:auto; }
+  .hero-cta-row, .hero-tagline, .hero-sub { animation:none; opacity:1; }
+  .artist-card-img { transition:none; }
+}

@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework><Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>ai-tlt-artistlockers-host-development</UserSecretsId>
+    <AssemblyName>AiTlt.ArtistLockers.Host</AssemblyName>
+    <RootNamespace>AiTlt.ArtistLockers.Hosting</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../../ai-tlt-identity/modules/identity/http/AiTlt.Identity.Http.csproj" />
+    <ProjectReference Include="../../../ai-tlt-platform/src/AiTlt.InternalAccess/AiTlt.InternalAccess.csproj" />
+    <ProjectReference Include="../../../ai-tlt-platform/src/AiTlt.Assets.Http/AiTlt.Assets.Http.csproj" />
+    <ProjectReference Include="../../../ai-tlt-platform/src/AiTlt.Jobs.Http/AiTlt.Jobs.Http.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Live settings and secrets never ship in a publish; the template does. -->
+    <Content Update="appsettings.json;appsettings.*.json" CopyToPublishDirectory="Never" />
+    <Content Update="appsettings.example.json" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

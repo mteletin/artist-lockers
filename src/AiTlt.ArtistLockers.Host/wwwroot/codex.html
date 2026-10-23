@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="/ai-tlt/ui/v1/tokens.css">
+<link rel="stylesheet" href="/ai-tlt/ui/v1/base.css">
+<script src="/app/product-adapter.js" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Codex · Artist Lockers</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="assets/css/styles.css?v=20261001-mobile-ux-1">
+<link rel="stylesheet" href="assets/css/confirm-dialog.css?v=20260808-dialog-1">
+<link rel="stylesheet" href="assets/css/codex.css?v=20261010-ui-3">
+<script src="assets/js/asset-picker.js?v=20260929-picker-1" defer></script>
+<script src="assets/js/confirm-dialog.js?v=20260807-confirm-1" defer></script>
+<script src="assets/vendor/codex-editor.min.js?v=20260930-gen-image-1" defer></script>
+<script src="assets/js/codex-cut.js?v=20260930-export-1" defer></script>
+<script src="assets/js/gen-models.js?v=20260930-models-1" defer></script>
+<script src="assets/js/codex-shot-prompts.js?v=20261006-concepts-1" defer></script>
+<script src="assets/js/codex-storyboard.js?v=20261006-concepts-1" defer></script>
+<script src="assets/js/codex-genimage.js?v=20261001-members-1" defer></script>
+<script src="assets/js/codex.js?v=20261010-ui-3" defer></script>
+<link rel="stylesheet" href="assets/css/mobile.css?v=20261001-mobile-ux-1">
+<link rel="stylesheet" href="/app/artistlockers.css">
+<script type="module" src="/app/codex-shell.js"></script>
+</head>
+<body class="auth-page codex-page">
+<div id="alHeader"></div>
+<main class="cx-main" id="codexMain">
+  <p id="cxLive" class="sr-only" role="status" aria-live="polite"></p>
+  <section id="cxAccess" class="cx-access" aria-live="polite"><div class="section-label">Your writing workspace</div><h1 class="account-title">Codex</h1><p>Checking access…</p></section>
+  <div id="cxContent" hidden>
+    <header class="cx-top">
+      <div class="cx-brand">ARTIST LOCKERS <span>/</span> CODEX</div>
+      <div class="cx-crumb" id="cxCrumb" role="navigation" aria-label="Page path"></div>
+      <span class="cx-save" id="cxSave" role="status" aria-live="polite"></span>
+    </header>
+    <div class="cx-shell">
+      <aside class="cx-pane cx-left" id="cxLeftPanel" aria-label="Pages">
+        <div class="cx-pages-head">
+          <h2 class="cx-pane-title" id="cxTreeTitle"><button class="cx-pages-toggle" type="button" id="cxPagesToggle" aria-expanded="true" aria-controls="cxPageBrowser"><span class="cx-chevron" aria-hidden="true">›</span>Pages</button></h2>
+          <button class="cx-newpage" type="button" id="cxNewPage">+ New page</button>
+        </div>
+        <div class="cx-page-browser" id="cxPageBrowser">
+          <label class="cx-search"><span class="sr-only">Search the Codex</span><input id="cxSearch" type="search" placeholder="Search pages…" autocomplete="off" maxlength="200"></label>
+          <div class="cx-tree-actions" aria-label="Page branches">
+            <button type="button" id="cxCollapsePages">Collapse all</button>
+            <button type="button" id="cxExpandPages">Expand all</button>
+            <button type="button" class="cx-auto-width" id="cxAutoWidth" aria-pressed="true" title="Automatically fit the panel to visible page titles">Auto width</button>
+          </div>
+          <ul class="cx-tree" id="cxTree" aria-labelledby="cxTreeTitle" tabindex="0"></ul>
+        </div>
+        <div class="cx-panel-resize" id="cxPanelResize" role="separator" tabindex="0" aria-orientation="vertical" aria-label="Resize Pages panel" aria-controls="cxLeftPanel" aria-valuemin="220" aria-valuemax="480" aria-valuenow="240" title="Drag or use arrow keys for a fixed width. Double-click or press Enter for automatic width."></div>
+      </aside>
+
+      <section class="cx-pane cx-center" aria-label="Page">
+        <div class="cx-tabs cx-views" role="tablist" aria-label="View">
+          <button type="button" role="tab" id="cxViewWrite" aria-selected="true" aria-controls="cxDocWrap">Write</button>
+          <button type="button" role="tab" id="cxViewBoard" aria-selected="false" aria-controls="cxBoard" tabindex="-1">Storyboard<span class="cx-n" id="cxShotCount"></span></button>
+        </div>
+        <div class="cx-conflict" id="cxConflict" role="alert" hidden>
+          <span>Someone else saved this page after you opened it. Your changes are not saved.</span>
+          <button type="button" class="btn-ghost" id="cxReload">Load theirs</button>
+          <button type="button" class="btn-primary" id="cxOverwrite">Save mine over it</button>
+        </div>
+        <div class="cx-toolbar" role="toolbar" aria-label="Formatting" id="cxToolbar">
+          <button type="button" data-cmd="bold" aria-label="Bold (Ctrl+B)" title="Bold (Ctrl+B)"><b>B</b></button>
+          <button type="button" data-cmd="italic" aria-label="Italic (Ctrl+I)" title="Italic (Ctrl+I)"><i>I</i></button>
+          <button type="button" data-cmd="strike" aria-label="Strikethrough" title="Strikethrough"><s>S</s></button>
+          <span class="cx-sep"></span>
+          <button type="button" data-cmd="h2" aria-label="Heading" title="Heading">H2</button>
+          <button type="button" data-cmd="h3" aria-label="Subheading" title="Subheading">H3</button>
+          <button type="button" data-cmd="quote" aria-label="Quote" title="Quote">“ ”</button>
+          <button type="button" data-cmd="bullets" aria-label="Bulleted list" title="Bulleted list">•≡</button>
+          <button type="button" data-cmd="numbers" aria-label="Numbered list" title="Numbered list">1≡</button>
+          <span class="cx-sep"></span>
+          <button type="button" data-cmd="link" aria-label="Link" title="Link">Link</button>
+          <button type="button" data-cmd="image" aria-label="Image from the gallery" title="Image from the gallery">▣ Image</button>
+          <button type="button" data-cmd="genimage" id="cxGenImageBtn" aria-label="Generate an image here" title="Generate an image at the cursor, from the story around it" hidden>✦ Generate image</button>
+          <button type="button" data-cmd="mention" aria-label="Mention a page" title="Mention a page (type @)">@ Mention</button>
+          <span class="cx-sep"></span>
+          <button type="button" data-cmd="undo" aria-label="Undo (Ctrl+Z)" title="Undo (Ctrl+Z)">↶</button>
+          <button type="button" data-cmd="redo" aria-label="Redo (Ctrl+Shift+Z)" title="Redo (Ctrl+Shift+Z)">↷</button>
+          <span class="cx-hint">Select text, or right-click it, to make a task or a shot</span>
+        </div>
+        <div class="cx-doc-wrap" id="cxDocWrap">
+          <div class="cx-empty" id="cxEmpty" hidden><p>The Codex is empty.</p><button type="button" class="btn-primary" id="cxFirstPage">Create the first page</button></div>
+          <article class="cx-doc" id="cxDoc" hidden>
+            <label class="sr-only" for="cxTitle">Page title</label>
+            <input class="cx-title" id="cxTitle" maxlength="180" placeholder="Untitled" autocomplete="off">
+            <div class="cx-meta">
+              <label><span class="sr-only">Page type</span><select id="cxType" class="cx-type"></select></label>
+              <span id="cxEdited"></span>
+              <span class="cx-chip cx-owner" id="cxOwner" hidden></span>
+              <button type="button" class="btn-ghost cx-meta-btn" id="cxCoverage" aria-pressed="false">Coverage</button>
+              <button type="button" class="btn-ghost cx-meta-btn" id="cxNextGap" hidden>Next gap →</button>
+              <button type="button" class="btn-ghost cx-share" id="cxShare" hidden>Share</button>
+              <details class="cx-page-menu" id="cxPageMenu">
+                <summary>Page ⋯</summary>
+                <div class="cx-page-menu-body">
+                  <label>Inside<select id="cxParent"></select></label>
+                  <div class="cx-row"><button type="button" class="btn-ghost" id="cxMoveUp">↑ Up</button><button type="button" class="btn-ghost" id="cxMoveDown">↓ Down</button></div>
+                  <button type="button" class="btn-danger" id="cxDelete">Delete page</button>
+                </div>
+              </details>
+            </div>
+            <div id="cxEditor" class="cx-editor"></div>
+          </article>
+        </div>
+        <div class="cx-board" id="cxBoard" role="tabpanel" aria-labelledby="cxViewBoard" hidden></div>
+      </section>
+
+      <aside class="cx-pane cx-right" aria-label="Linked work">
+        <div class="cx-tabs" role="tablist">
+          <button type="button" role="tab" id="cxTabTasks" aria-selected="true" aria-controls="cxPanelTasks">Tasks<span class="cx-n" id="cxTaskCount"></span></button>
+          <button type="button" role="tab" id="cxTabLinks" aria-selected="false" aria-controls="cxPanelLinks" tabindex="-1">Backlinks<span class="cx-n" id="cxLinkCount"></span></button>
+          <button type="button" class="cx-refresh" id="cxRefresh" aria-label="Refresh task status" title="Refresh task status">↻</button>
+        </div>
+        <div class="cx-panel" role="tabpanel" id="cxPanelTasks" aria-labelledby="cxTabTasks"></div>
+        <div class="cx-panel" role="tabpanel" id="cxPanelLinks" aria-labelledby="cxTabLinks" hidden></div>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<div class="cx-bubble" id="cxBubble" role="toolbar" aria-label="Selection" hidden>
+  <button type="button" data-bubble="task"><b>✦</b> Task</button>
+  <button type="button" data-bubble="shot">🎬 Shot</button>
+  <button type="button" data-bubble="page">+ Page</button>
+  <button type="button" data-bubble="bold" aria-label="Bold"><b>B</b></button>
+  <button type="button" data-bubble="italic" aria-label="Italic"><i>I</i></button>
+  <button type="button" data-bubble="link">Link</button>
+</div>
+
+<div class="cx-suggest" id="cxSuggest" role="listbox" aria-label="Pages to mention" hidden></div>
+
+<div class="cx-backdrop" id="cxTaskBackdrop" hidden>
+  <form class="cx-dialog" id="cxTaskForm" role="dialog" aria-modal="true" aria-labelledby="cxTaskHeading">
+    <h2 id="cxTaskHeading">New board task</h2>
+    <blockquote class="cx-quote" id="cxTaskQuote"></blockquote>
+    <label class="cx-field">Title<input id="cxTaskTitle" maxlength="180" required></label>
+    <label class="cx-field">Team<select id="cxTaskKind" required></select></label>
+    <label class="cx-field">Individual<select id="cxTaskAssignee"><option value="">Anyone on the team</option></select></label>
+    <p class="cx-error" id="cxTaskError" role="alert"></p>
+    <div class="cx-row"><button type="button" class="btn-ghost" id="cxTaskCancel">Cancel</button><button type="submit" class="btn-primary" id="cxTaskSubmit">Create task</button></div>
+  </form>
+</div>
+
+<div class="cx-backdrop" id="cxPageBackdrop" hidden>
+  <form class="cx-dialog" id="cxPageForm" role="dialog" aria-modal="true" aria-labelledby="cxPageHeading">
+    <h2 id="cxPageHeading">New page</h2>
+    <label class="cx-field">Title<input id="cxPageTitle" maxlength="180" required></label>
+    <label class="cx-field">Type<select id="cxPageType"></select></label>
+    <label class="cx-field">Inside<select id="cxPageParent"></select></label>
+    <p class="cx-help" id="cxPageHelp" hidden>The selected text becomes a mention of the new page.</p>
+    <p class="cx-error" id="cxPageError" role="alert"></p>
+    <div class="cx-row"><button type="button" class="btn-ghost" id="cxPageCancel">Cancel</button><button type="submit" class="btn-primary" id="cxPageSubmit">Create page</button></div>
+  </form>
+</div>
+
+<div class="cx-backdrop" id="cxShareBackdrop" hidden>
+  <form class="cx-dialog cx-share-dialog" id="cxShareForm" role="dialog" aria-modal="true" aria-labelledby="cxShareHeading" aria-describedby="cxShareHelp">
+    <h2 id="cxShareHeading">Share</h2>
+    <div class="cx-share-body">
+      <p class="cx-help" id="cxShareHelp"></p>
+      <ul class="cx-share-list" id="cxShareList" aria-label="People it is shared with"></ul>
+      <div class="cx-share-add">
+        <label class="cx-field cx-share-find">Find a person<input type="search" id="cxShareFind" autocomplete="off" placeholder="Type a name"></label>
+        <label class="cx-field">Person<select id="cxSharePerson"></select></label>
+        <label class="cx-field">Can<select id="cxShareAccess"><option value="read">Read</option><option value="edit">Edit</option></select></label>
+      </div>
+      <p class="cx-error" id="cxShareError" role="alert"></p>
+    </div>
+    <div class="cx-row cx-share-footer"><button type="button" class="btn-ghost" id="cxShareClose">Done</button><button type="submit" class="btn-primary" id="cxShareSubmit">Share</button></div>
+  </form>
+</div>
+
+<div class="cx-backdrop" id="cxLinkBackdrop" hidden>
+  <form class="cx-dialog" id="cxLinkForm" role="dialog" aria-modal="true" aria-labelledby="cxLinkHeading">
+    <h2 id="cxLinkHeading">Link</h2>
+    <label class="cx-field">Address<input id="cxLinkHref" maxlength="2000" placeholder="https://…, /page.html or #section" autocomplete="off"></label>
+    <p class="cx-error" id="cxLinkError" role="alert"></p>
+    <div class="cx-row"><button type="button" class="btn-ghost" id="cxLinkRemove">Remove link</button><button type="button" class="btn-ghost" id="cxLinkCancel">Cancel</button><button type="submit" class="btn-primary">Apply</button></div>
+  </form>
+</div>
+<div class="cx-backdrop" id="cxGenBackdrop" hidden>
+  <form class="cx-dialog cx-gen-dialog" id="cxGenForm" role="dialog" aria-modal="true" aria-labelledby="cxGenHeading">
+    <h2 id="cxGenHeading">Generate an image here</h2>
+    <label class="cx-field">What it should show<textarea id="cxGenIdea" maxlength="500" rows="3" placeholder="The council at dusk, Vex at the head of the table"></textarea></label>
+    <p class="cx-help">The prompt writer also reads this page, the page it sits in, the pages beside it and the pages it mentions.</p>
+    <div class="cx-field" id="cxGenRefsField">References, nearest the cursor<div class="cx-gen-refs" id="cxGenRefs"></div></div>
+    <div class="cx-gen-sizes">
+      <label class="cx-field">Shape<select id="cxGenAspect"></select></label>
+      <label class="cx-field">Size<select id="cxGenSize"></select></label>
+    </div>
+    <label class="cx-field">Prompt<textarea id="cxGenPrompt" maxlength="8000" rows="6" placeholder="Write prompt fills this in; edit it before generating."></textarea></label>
+    <p class="cx-help" id="cxGenStatus" aria-live="polite"></p>
+    <p class="cx-error" id="cxGenError" role="alert"></p>
+    <div class="cx-row"><button type="button" class="btn-ghost" id="cxGenCancel">Cancel</button><button type="button" class="btn-ghost" id="cxGenWrite">✦ Write prompt</button><button type="submit" class="btn-primary" id="cxGenSubmit">Generate</button></div>
+  </form>
+</div>
+</body>
+</html>

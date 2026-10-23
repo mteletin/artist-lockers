@@ -1,0 +1,31 @@
+[Unit]
+Description=Artist Lockers (creator workspace)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=ai-tlt-artistlockers
+Group=ai-tlt-artistlockers
+WorkingDirectory=/opt/ai-tlt-artistlockers
+ExecStart=/usr/bin/dotnet /opt/ai-tlt-artistlockers/AiTlt.ArtistLockers.Host.dll
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=DOTNET_NOLOGO=1
+Environment=HOME=/var/lib/ai-tlt-artistlockers
+# Kestrel binds :9440, so the service needs no capabilities at all.
+CapabilityBoundingSet=
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+ReadWritePaths=/var/lib/ai-tlt-artistlockers
+Restart=always
+RestartSec=5
+KillSignal=SIGINT
+TimeoutStopSec=20
+SyslogIdentifier=ai-tlt-artistlockers
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,1090 @@
+/* MiniMax H3 video studio — lives inside the account Tools tab.
+   Colours come from the theme tokens only; nothing here hardcodes a value. */
+
+/* ── idea box (prompt specialist) ──────────────────────────────────────── */
+
+.h3-idea {
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-subtle);
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.h3-idea-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.h3-idea-row .account-muted { flex: 1 1 240px; }
+
+.h3-compose textarea.is-busy { opacity: 0.55; }
+
+.h3-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.h3-bell {
+  padding: 4px 10px;
+  font-size: 15px;
+  line-height: 1.2;
+  opacity: 0.45;
+}
+
+.h3-bell[aria-pressed="true"] { opacity: 1; }
+
+/* ── queue bar ─────────────────────────────────────────────────────────── */
+
+.h3-queue-block {
+  margin: 18px 0 26px;
+  padding: 14px 16px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+}
+
+.h3-queue-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.h3-queue-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.h3-queue-count {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.h3-queue-bar {
+  display: flex;
+  gap: 3px;
+  min-height: 26px;
+  align-items: stretch;
+}
+
+.h3-queue-empty {
+  font-size: 12px;
+  color: var(--text-disabled);
+  align-self: center;
+}
+
+.h3-seg {
+  flex: 1 1 0;
+  min-width: 10px;
+  max-width: 64px;
+  border: 1px solid var(--border-medium);
+  background: var(--bg-disabled);
+  cursor: default;
+  padding: 0;
+}
+
+.h3-seg.is-mine {
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+  cursor: pointer;
+}
+
+.h3-seg.is-running { position: relative; overflow: hidden; }
+
+/* Sampler progress, fed from ComfyUI's websocket by the backend listener. */
+.h3-seg-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  background: var(--accent);
+  transition: width 0.6s ease;
+  pointer-events: none;
+}
+
+/* Before the first sampler step (models loading, references encoding) there is no number
+   yet, so the segment sweeps instead of lying with a fake percentage. */
+.h3-seg.is-running.is-indeterminate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--accent-glow), transparent);
+  opacity: 0.55;
+  animation: h3-sweep 1.5s linear infinite;
+}
+
+@keyframes h3-sweep {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .h3-seg.is-running.is-indeterminate::after { animation: none; opacity: 0.3; }
+  .h3-seg-fill { transition: none; }
+}
+
+.h3-seg.is-selected { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* GPU temperature strip: one chip per card, the LLM pair muted so it does not read as
+   render capacity. Bars by default (track and outline borrowed from the queue segments),
+   numbers on request; the colour tiers follow the junction temperature either way. */
+.h3-gpu-strip { margin-top: 10px; }
+.h3-gpu-strip[hidden] { display: none; }
+.h3-gpu-strip-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.h3-gpu-mode { display: flex; gap: 4px; }
+.h3-gpu-mode-tab {
+  padding: 2px 8px;
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
+  background: transparent;
+  border: 1px solid var(--border-medium);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.h3-gpu-mode-tab[aria-pressed="true"] {
+  color: var(--text-primary);
+  border-color: var(--accent);
+  background: var(--accent-bg-subtle);
+}
+.h3-gpu-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+}
+.h3-gpu {
+  padding: 8px 10px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  min-width: 0;
+}
+.h3-gpu.is-llm { opacity: 0.72; }
+.h3-gpu.is-stale { opacity: 0.55; }
+.h3-gpu-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.h3-gpu-label { font-weight: 600; color: var(--text-primary); }
+.h3-gpu-role { text-transform: none; letter-spacing: 0; }
+
+/* bars: each on its own row behind a small icon that says what it measures */
+.h3-gpu-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 5px;
+  color: var(--text-muted);
+}
+.h3-gpu-row.is-temp { margin-top: 6px; }
+.h3-gpu-icon {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+}
+.h3-gpu-row.is-temp .h3-gpu-icon { width: 14px; height: 14px; color: var(--text-primary); }
+.h3-gpu.is-warm .h3-gpu-row.is-temp .h3-gpu-icon { color: var(--accent); }
+.h3-gpu.is-hot .h3-gpu-row.is-temp .h3-gpu-icon { color: var(--danger); }
+.h3-gpu-bar {
+  position: relative;
+  flex: 1 1 auto;
+  height: 6px;
+  border: 1px solid var(--border-medium);
+  background: var(--bg-disabled);
+  overflow: hidden;
+}
+.h3-gpu-bar.is-temp { height: 12px; }
+.h3-gpu-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  background: var(--text-muted);
+  transition: width 0.6s ease;
+}
+.h3-gpu-bar.is-temp .h3-gpu-fill { background: var(--text-primary); }
+.h3-gpu-tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--border-strong);
+  opacity: 0.7;
+}
+.h3-gpu.is-warm .h3-gpu-bar.is-temp .h3-gpu-fill { background: var(--accent); }
+.h3-gpu.is-hot .h3-gpu-bar.is-temp .h3-gpu-fill { background: var(--danger); }
+
+/* numbers */
+.h3-gpu-temp {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-top: 2px;
+}
+.h3-gpu-degrees {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.h3-gpu-limit { font-size: 11px; color: var(--text-muted); }
+.h3-gpu-facts,
+.h3-gpu-note {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.h3-gpu-note { font-weight: 600; }
+.h3-gpu.is-warm .h3-gpu-degrees,
+.h3-gpu.is-warm .h3-gpu-note { color: var(--accent); }
+.h3-gpu.is-hot { border-color: var(--danger); }
+.h3-gpu.is-hot .h3-gpu-degrees,
+.h3-gpu.is-hot .h3-gpu-note { color: var(--danger); }
+
+.h3-queue-legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.h3-queue-legend span { display: inline-flex; align-items: center; gap: 6px; }
+
+.h3-swatch {
+  width: 11px;
+  height: 11px;
+  display: inline-block;
+  border: 1px solid var(--border-medium);
+}
+
+.h3-swatch.is-mine { background: var(--text-primary); border-color: var(--text-primary); }
+.h3-swatch.is-theirs { background: var(--bg-disabled); }
+.h3-swatch.is-running { background: var(--accent-glow); border-color: var(--accent-glow); }
+
+.h3-queue-detail {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.h3-queue-detail .h3-detail-prompt {
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.h3-queue-detail .h3-detail-meta { color: var(--text-muted); }
+
+/* ── composer ──────────────────────────────────────────────────────────── */
+
+.h3-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .h3-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+.h3-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.h3-field--inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.h3-field--inline .h3-field-label { flex: 0 0 auto; }
+.h3-field--inline input[type="range"] { flex: 1 1 auto; min-width: 0; }
+.h3-field--wide { grid-column: 1 / -1; }
+
+.h3-field-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.h3-compose textarea {
+  width: 100%;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.h3-prompt-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 6px 0 18px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.h3-out {
+  font-size: 12px;
+  color: var(--text-secondary);
+  min-width: 92px;
+  text-align: right;
+}
+
+/* ── reference rails ───────────────────────────────────────────────────── */
+
+.h3-rails {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.h3-rail-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.h3-rail-count { font-weight: 400; letter-spacing: 0; text-transform: none; }
+
+.h3-rail-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.h3-slot {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  padding: 0;
+  border: 1px dashed var(--border-strong);
+  background: var(--bg-input);
+  color: var(--text-muted);
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.h3-slot:hover { border-color: var(--accent); color: var(--text-primary); }
+
+.h3-slot.is-filled {
+  border-style: solid;
+  border-color: var(--border-medium);
+  cursor: default;
+}
+
+/* Absolute so a poster can lie over the glyph that is still standing in for it. */
+.h3-slot img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.h3-slot-meta {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: 1px 4px;
+  font-size: 9px;
+  font-weight: 700;
+  background: var(--bg-overlay-heavy);
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+.h3-slot-glyph { font-size: 22px; line-height: 1; }
+
+.h3-slot-kindmark {
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  padding: 0 6px;
+  text-align: center;
+  word-break: break-all;
+}
+
+.h3-slot-tag {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding: 1px 5px;
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--bg-overlay-heavy);
+  color: var(--text-primary);
+  border: 0;
+  cursor: pointer;
+}
+
+.h3-slot-tag:hover { color: var(--accent-glow); }
+
+.h3-slot-remove {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  line-height: 18px;
+  text-align: center;
+  padding: 0;
+  border: 0;
+  background: var(--bg-overlay-heavy);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.h3-slot-remove:hover { color: var(--danger); }
+
+.h3-slot-audio {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 1px 5px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  border: 0;
+  background: var(--bg-overlay-heavy);
+  color: var(--text-disabled);
+  cursor: pointer;
+}
+
+.h3-slot-audio.is-on { color: var(--success); }
+
+/* ── advanced + submit ─────────────────────────────────────────────────── */
+
+.h3-basics {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.h3-advanced {
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-subtle);
+  padding: 10px 14px;
+  margin-bottom: 18px;
+}
+
+.h3-advanced summary {
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.h3-advanced-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.h3-dims {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+}
+
+.h3-dims input { width: 100%; min-width: 0; }
+
+.h3-submit-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.h3-slots { font-size: 12px; color: var(--text-muted); }
+
+/* ── preview ───────────────────────────────────────────────────────────── */
+
+.h3-preview {
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-subtle);
+  padding: 14px 16px;
+}
+
+.h3-preview-head {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 12px;
+}
+
+.h3-preview-title {
+  font-size: 13px;
+  color: var(--text-secondary);
+  word-break: break-word;
+}
+
+.h3-preview-stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.h3-preview-stage video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background: var(--bg-deep);
+}
+
+.h3-preview-empty {
+  font-size: 12px;
+  color: var(--text-disabled);
+  padding: 12px;
+  text-align: center;
+}
+
+.h3-preview-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+/* ── job lists ─────────────────────────────────────────────────────────── */
+
+.h3-lists {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 28px;
+}
+
+.h3-list-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.h3-list-head h4 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.h3-small-btn { padding: 2px 8px; font-size: 11px; }
+
+.h3-job-list,
+.h3-shelf {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.h3-job {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-left: 2px solid var(--border-medium);
+}
+
+.h3-job[data-status="running"] { border-left-color: var(--accent); }
+.h3-job[data-status="completed"] { border-left-color: var(--success); }
+.h3-job[data-status="failed"],
+.h3-job[data-status="cancelled"] { border-left-color: var(--danger); }
+
+.h3-job-main { flex: 1 1 auto; min-width: 0; }
+
+.h3-job-prompt {
+  font-size: 12px;
+  color: var(--text-primary);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+}
+
+.h3-job-meta {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.h3-job-error {
+  margin-top: 5px;
+  font-size: 11px;
+  color: var(--danger);
+  word-break: break-word;
+}
+
+.h3-job-side {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.h3-job-actions { display: flex; gap: 6px; }
+
+.h3-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border: 1px solid var(--border-medium);
+  color: var(--text-muted);
+}
+
+.h3-badge.is-new {
+  color: var(--bg-body);
+  background: var(--success);
+  border-color: var(--success);
+}
+
+.h3-badge.is-staged { color: var(--gold-bright); border-color: var(--gold-trim); }
+.h3-badge.is-failed { color: var(--danger); border-color: var(--danger); }
+
+.h3-shelf-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+
+.h3-shelf-item:hover { border-color: var(--border-strong); }
+.h3-shelf-item.is-unseen { border-left: 2px solid var(--success); }
+/* An unread failure should not read as good news. */
+.h3-shelf-item.is-unseen.is-failed { border-left-color: var(--danger); }
+
+.h3-shelf-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── reference picker modal ────────────────────────────────────────────── */
+
+.h3-picker-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.h3-picker-tab {
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid var(--border-medium);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.h3-picker-tab.is-active {
+  color: var(--text-primary);
+  border-color: var(--accent);
+  background: var(--accent-bg-subtle);
+}
+
+.h3-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  max-height: 46vh;
+  overflow-y: auto;
+}
+
+.h3-picker-card {
+  padding: 0;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: left;
+  overflow: hidden;
+}
+
+.h3-picker-card:hover { border-color: var(--accent); }
+
+.h3-picker-thumb {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-deep);
+  font-size: 26px;
+  color: var(--text-faint);
+  overflow: hidden;
+}
+
+.h3-picker-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* The hover clip, laid over the poster rather than replacing it, so the tile never blinks. */
+.h3-thumb-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: var(--bg-deep);
+}
+
+.h3-thumb-glyph { line-height: 1; }
+
+.h3-picker-name {
+  padding: 6px 8px 2px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.h3-picker-meta {
+  padding: 0 8px 6px;
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.h3-picker-foot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.h3-picker-note { font-size: 11px; color: var(--text-muted); }
+
+/* ── admin: instances and caps ─────────────────────────────────────────── */
+
+.h3-admin-workers,
+.h3-admin-models {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.h3-admin-worker {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+}
+
+.h3-admin-worker-main { flex: 1 1 auto; min-width: 0; }
+
+.h3-admin-worker-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.h3-admin-worker-url {
+  font-size: 11px;
+  color: var(--text-muted);
+  word-break: break-all;
+}
+
+.h3-admin-worker-health {
+  margin-top: 3px;
+  font-size: 11px;
+  color: var(--text-disabled);
+  word-break: break-word;
+}
+
+.h3-admin-worker-health.is-error { color: var(--danger); }
+
+.h3-admin-worker-side {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.h3-admin-add {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.h3-admin-add input { flex: 1 1 200px; min-width: 0; }
+
+.h3-admin-worker-model {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.h3-admin-worker-model input { flex: 1 1 auto; min-width: 0; font-size: 12px; }
+
+.h3-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  align-items: end;
+}
+
+.h3-admin-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.h3-admin-grid label > span {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.h3-admin-span { grid-column: 1 / -1; }
+
+.h3-admin-check {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+}
+
+.h3-admin-check > span {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+/* A model row: the worker card, stacked so its settings grid can sit under the name. */
+.h3-admin-model { flex-direction: column; align-items: stretch; }
+.h3-admin-model-head { display: flex; align-items: center; gap: 14px; }
+.h3-admin-model .h3-admin-grid { margin-top: 10px; }
+
+/* ── Model select and Image Generator ────────────────────────────────────── */
+
+.h3-model-field {
+  margin-bottom: 14px;
+}
+
+.h3-model-field select:disabled {
+  color: var(--text-muted);
+  cursor: default;
+}
+
+.h3-preview-stage img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+.img-mode-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.img-modes {
+  flex-wrap: wrap;
+}
+
+/* Square stage with a checkerboard, so transparent and cut-out results read as transparent. */
+.img-stage {
+  aspect-ratio: 1 / 1;
+  background-color: var(--bg-input);
+  background-image:
+    linear-gradient(45deg, var(--bg-subtle) 25%, transparent 25%, transparent 75%, var(--bg-subtle) 75%),
+    linear-gradient(45deg, var(--bg-subtle) 25%, transparent 25%, transparent 75%, var(--bg-subtle) 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+}
+
+/* ── frame tool (studio preview + gallery details) ─────────────────────── */
+
+#h3Idea { max-height: 50vh; }
+
+.h3-preview-frames,
+.gen-detail-frames { margin-top: 12px; }
+.gen-detail-frames { margin-bottom: 14px; }
+
+.gen-frames {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+}
+
+.gen-frames-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.gen-frames-label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.gen-frames-readout {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.gen-frames input[type="range"] {
+  width: 100%;
+  min-width: 0;
+  accent-color: var(--accent);
+}
+
+.gen-frames-fine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gen-frames-fine input[type="range"] { flex: 1 1 auto; }
+
+.gen-frames-step {
+  padding: 4px 10px;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.gen-frames-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.gen-frames-status { margin-top: 0; }
+.gen-frames-status.is-error { color: var(--danger); }
+
+/* Cloud models (Seevio) reshape the composer: explicit, because .h3-field and details set display. */
+.h3-field[hidden],
+.h3-advanced[hidden],
+.h3-cloud-note[hidden],
+.h3-cont-note[hidden],
+.h3-studio.is-cloud .h3-local-only {
+  display: none;
+}
+
+.h3-cloud-note {
+  margin: -4px 0 0;
+  font-size: 13px;
+}
+
+/* Extend+ in the composer: what the render continues, and the way back to a plain render. */
+.h3-cont-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+.h3-cont-note span { flex: 1; }
+.h3-cont-clear {
+  padding: 2px 8px;
+  line-height: 1;
+}

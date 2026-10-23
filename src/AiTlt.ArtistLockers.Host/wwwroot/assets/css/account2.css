@@ -1,0 +1,1059 @@
+/* .admin-tab is display:flex and .admin-tab-panel is display:none/block, so an author
+   display value beats the UA's [hidden] rule — without this, setting .hidden on a tab
+   does nothing at all. Applies to every tab, not just the one that first hit this. */
+.admin-tab[hidden],
+.admin-tab-panel[hidden] {
+  display: none !important;
+}
+
+#panelNationalFinal[hidden] {
+  display: none !important;
+}
+
+body.auth-page footer {
+  position: static;
+}
+
+.nf-hero {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  align-items: end;
+  margin: 18px 0 24px;
+  padding: 24px;
+  background:
+    linear-gradient(120deg, color-mix(in srgb, var(--accent) 16%, transparent), transparent 54%),
+    var(--bg-subtle);
+  border: 1px solid var(--border-accent);
+}
+
+.nf-display-title {
+  color: var(--text-primary);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(44px, 8vw, 86px);
+  line-height: 0.88;
+  letter-spacing: 2px;
+}
+
+.nf-status-card {
+  min-width: 130px;
+  padding: 12px 16px;
+  color: var(--accent);
+  background: var(--bg-body);
+  border: 1px solid var(--border-medium);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.nf-form,
+.nf-section {
+  display: grid;
+  gap: 18px;
+}
+
+.nf-section {
+  margin-top: 14px;
+  padding: 24px 26px;
+  background: var(--bg-panel);
+  border: none;
+}
+
+.nf-section-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  padding-inline: 12px;
+}
+
+.nf-section-head > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-primary);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 1.5px;
+}
+
+.nf-step {
+  color: var(--accent);
+  font-size: 15px;
+  letter-spacing: 1px;
+  margin-left: 4px;
+}
+
+.nf-section-head .roadmap-add-btn {
+  margin-right: 4px;
+}
+
+.nf-add-song-end {
+  margin-top: 14px;
+  width: 100%;
+}
+
+.nf-public-toggle {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 16px 18px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-medium);
+}
+
+.nf-public-toggle input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent);
+}
+
+.nf-public-toggle span,
+.nf-public-toggle small {
+  display: block;
+}
+
+.nf-public-toggle strong {
+  color: var(--text-primary);
+}
+
+.nf-public-toggle small {
+  margin-top: 3px;
+  color: var(--text-muted);
+}
+
+.nf-entry-count {
+  padding-inline: 16px;
+  color: var(--text-muted);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.nf-entry-list,
+.nf-winner-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.nf-entry-card {
+  display: grid;
+  grid-template-columns: 48px minmax(170px, 0.7fr) minmax(180px, 1fr) minmax(220px, 1.2fr) auto;
+  gap: 12px;
+  align-items: end;
+  padding: 18px 20px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-medium);
+}
+
+.nf-entry-number {
+  align-self: center;
+  color: var(--accent);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  line-height: 1;
+}
+
+.nf-entry-card .form-row {
+  min-width: 0;
+}
+
+.nf-entry-card input,
+.nf-entry-card select {
+  width: 100%;
+}
+
+.nf-entry-remove {
+  min-height: 44px;
+  padding: 10px 14px;
+}
+
+.nf-empty {
+  padding: 30px 34px;
+  color: var(--text-muted);
+  text-align: center;
+  border: 1px dashed var(--border-medium);
+}
+
+/* Scored card: the points badge overlays the top-right corner so it does not
+   consume a column in the fixed .nf-entry-card grid template. */
+.nf-entry-card.is-scored {
+  position: relative;
+}
+
+.nf-entry-score {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  align-self: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.nf-vote-outcome {
+  display: grid;
+  gap: 6px;
+  padding: 24px 28px;
+  background: var(--accent-bg-subtle);
+  border: 1px solid var(--border-accent);
+}
+
+.nf-vote-outcome strong {
+  color: var(--text-primary);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 1.4px;
+}
+
+.nf-vote-outcome span {
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.nf-winner-card {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 18px;
+  color: var(--text-secondary);
+  text-align: left;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-medium);
+  font: inherit;
+  cursor: pointer;
+}
+
+.nf-winner-card.is-winner {
+  border-color: var(--accent);
+  background: var(--accent-bg-subtle);
+}
+
+.nf-winner-thumb {
+  width: 56px;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--bg-body);
+}
+
+.nf-winner-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nf-winner-copy {
+  display: grid;
+  gap: 3px;
+}
+
+.nf-winner-copy strong {
+  color: var(--text-primary);
+}
+
+.nf-winner-copy span,
+.nf-winner-state {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.nf-winner-state {
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.nf-actions {
+  position: sticky;
+  bottom: 12px;
+  z-index: 3;
+  padding: 18px 20px;
+  background: color-mix(in srgb, var(--bg-body) 92%, transparent);
+  border: 1px solid var(--border-medium);
+  backdrop-filter: blur(12px);
+}
+
+.nf-action-message.is-progress {
+  color: var(--accent);
+}
+
+/* The publish/confirm dialog styles moved to confirm-dialog.css — it is a shared
+   component and listen.html needs it without the rest of this file. */
+
+.nf-reveal-picker legend { padding: 0 6px; font-weight: 600; }
+.nf-reveal-picker label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.nf-tie-options { display: grid; gap: 6px; }
+.nf-tie-options label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+
+/* Second tab row inside the Tools tab, one button per tool. Mirrors .submission-subtabs, but
+   the columns adapt to however many tools the signed-in user is allowed to see. */
+.tools-subtabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0;
+}
+
+.tools-subtab {
+  flex: 1 1 180px;
+  min-height: 44px;
+  padding: 10px 14px;
+  color: var(--text-secondary);
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.tools-subtab.is-active {
+  color: var(--text-primary);
+  border-color: var(--accent);
+  background: var(--bg-subtle);
+}
+
+/* Explicit, because display on the class would otherwise override the hidden attribute. */
+.tools-subtab[hidden] {
+  display: none;
+}
+
+.tools-subpanel {
+  display: none;
+}
+
+.tools-subpanel.is-visible {
+  display: block;
+}
+
+.tools-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+  gap: 24px;
+  align-items: stretch;
+  margin: 18px 0 24px;
+  padding: 26px;
+  background:
+    linear-gradient(120deg, color-mix(in srgb, var(--accent) 20%, transparent), transparent 58%),
+    var(--bg-subtle);
+  border: 1px solid var(--border-accent);
+  clip-path: polygon(18px 0, 100% 0, calc(100% - 18px) 100%, 0 100%);
+}
+
+.tools-hero-copy {
+  display: grid;
+  align-content: end;
+  gap: 12px;
+  min-height: 220px;
+  padding: 10px 6px;
+}
+
+.tools-kicker {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.tools-hero h2,
+.tools-section-head h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-family: 'Bebas Neue', sans-serif;
+  line-height: 0.92;
+  letter-spacing: 1.7px;
+}
+
+.tools-hero h2 {
+  font-size: clamp(52px, 8vw, 96px);
+}
+
+.tools-section-head h3 {
+  font-size: clamp(34px, 5vw, 48px);
+}
+
+.tools-hero p {
+  max-width: 640px;
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.tools-upload-card {
+  display: grid;
+  align-content: end;
+  gap: 14px;
+  padding: 20px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-medium);
+  clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+}
+
+.tools-file-drop {
+  display: grid;
+  gap: 8px;
+  min-height: 150px;
+  padding: 20px;
+  color: var(--text-secondary);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 10%, transparent), transparent 62%),
+    var(--bg-body);
+  border: 1px dashed var(--border-medium);
+  cursor: pointer;
+}
+
+.tools-file-label {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+}
+
+.tools-file-drop strong {
+  color: var(--text-primary);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+.tools-file-drop small {
+  align-self: end;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.tools-upload-card input[type="file"] {
+  width: 100%;
+  color: var(--text-muted);
+}
+
+.tools-submit {
+  justify-self: stretch;
+}
+
+.tools-queue-panel {
+  display: grid;
+  gap: 16px;
+  padding: 24px 26px;
+  background: var(--bg-panel);
+}
+
+.tools-section-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.tools-job-list {
+  display: grid;
+  gap: 12px;
+}
+
+.tools-job-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding: 18px 20px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-medium);
+  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+}
+
+.tools-job-card[data-status="completed"] {
+  border-color: var(--border-accent);
+}
+
+.tools-job-main {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.tools-job-title {
+  color: var(--text-primary);
+  font-size: 17px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.tools-job-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.tools-job-error {
+  color: var(--danger, #e26d6d);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.tools-job-side {
+  display: grid;
+  justify-items: end;
+  gap: 10px;
+}
+
+.tools-job-status {
+  padding: 8px 12px;
+  color: var(--accent);
+  background: var(--bg-body);
+  border: 1px solid var(--border-medium);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+
+.tools-job-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.tools-job-action {
+  min-height: 36px;
+  padding: 9px 14px;
+  font-size: 12px;
+}
+
+@media (max-width: 980px) {
+  .nf-entry-card {
+    grid-template-columns: 42px 1fr 1fr;
+  }
+
+  .nf-entry-card .nf-entry-url {
+    grid-column: 2 / -1;
+  }
+
+  .nf-entry-remove {
+    grid-column: 3;
+  }
+}
+
+@media (max-width: 680px) {
+  .tools-hero {
+    grid-template-columns: 1fr;
+    clip-path: none;
+  }
+
+  .tools-hero-copy {
+    min-height: auto;
+  }
+
+  .tools-upload-card,
+  .tools-job-card {
+    clip-path: none;
+  }
+
+  .tools-section-head,
+  .tools-job-card {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+
+  .tools-section-head {
+    flex-direction: column;
+  }
+
+  .tools-job-side {
+    justify-items: start;
+  }
+
+  .tools-job-actions {
+    justify-content: flex-start;
+  }
+
+  .nf-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .nf-status-card {
+    justify-self: start;
+  }
+
+  .nf-section-head {
+    align-items: flex-start;
+    flex-direction: column;
+    padding-inline: 8px;
+  }
+
+  .nf-entry-card {
+    grid-template-columns: 34px 1fr;
+    align-items: stretch;
+  }
+
+  .nf-entry-card .form-row,
+  .nf-entry-card .nf-entry-url,
+  .nf-entry-remove {
+    grid-column: 2;
+  }
+
+  .nf-winner-card {
+    grid-template-columns: 48px 1fr;
+  }
+
+  .nf-winner-state {
+    grid-column: 2;
+  }
+}
+
+/* --- Tracks tab (party track library) --- */
+.tracks-add-form {
+  display: flex;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+/* A pasted link is the one thing typed here, so the field reads as a writing line
+   rather than a boxed control: no fill, no border but the baseline it sits on. */
+.tracks-add-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 2px;
+  color: var(--text-primary);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--border-medium);
+  font-size: 15px;
+}
+
+.tracks-add-form input::placeholder {
+  color: var(--text-muted);
+}
+
+.tracks-add-form input:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+}
+
+.tracks-error {
+  color: var(--accent);
+  font-size: 13px;
+  margin: 8px 0 0;
+}
+
+.tracks-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.track-row {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto auto auto;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-medium);
+}
+
+.track-row.is-retracted {
+  opacity: 0.55;
+}
+
+/* Used two ways: as the <img> itself in list rows, and as a wrapper around an <img>
+   in the preview. The wrapper case needs clipping or a large cover overflows the modal. */
+.track-cover {
+  width: 56px;
+  height: 56px;
+  flex: none;
+  overflow: hidden;
+  object-fit: cover;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-medium);
+}
+
+.track-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* The preview is the confirmation moment, so its cover earns more room. */
+#previewCover {
+  width: 72px;
+  height: 72px;
+}
+
+.track-meta {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.track-meta strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track-chip {
+  padding: 4px 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  border: 1px solid var(--border-medium);
+  white-space: nowrap;
+}
+
+.track-chip.is-approved-chip {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+@media (max-width: 700px) {
+  .track-row {
+    grid-template-columns: 44px 1fr;
+  }
+
+  .track-cover {
+    width: 44px;
+    height: 44px;
+  }
+
+  .track-chip,
+  .track-retract {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
+/* Two-step track submit: preview card + destination picker. */
+.track-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
+  padding: 14px 16px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--accent);
+}
+
+.track-preview[hidden] { display: none; }
+
+.track-preview-media {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Without this a long scraped title refuses to shrink and pushes the flex row wide. */
+.track-preview-media .track-meta {
+  min-width: 0;
+}
+
+/* This dialog carries two card grids plus a preview, so it gets more width and a
+   tighter vertical rhythm than the default 560px upload modal. */
+.track-add-modal {
+  width: min(780px, 94vw);
+}
+
+.track-add-modal .upload-modal-body {
+  gap: 14px;
+  padding: 18px 24px 22px;
+}
+
+/* Card pickers in the Add Track modal. Reuses .submission-artist-card from the contest
+   submission form so choosing an artist looks the same everywhere it happens. */
+.track-pick {
+  display: grid;
+  gap: 6px;
+}
+
+.track-pick-head {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.track-pick-grid,
+.track-target-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
+  gap: 6px;
+  max-height: 176px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.track-pick-card {
+  min-height: 0;
+  gap: 10px;
+  padding: 6px;
+}
+
+.track-pick-card .submission-artist-thumb {
+  width: 40px;
+}
+
+.track-pick-card .submission-artist-copy strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track-pick-card .submission-artist-copy span {
+  font-size: 11px;
+}
+
+.track-pick-card:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.track-pick-card:not(:disabled):hover {
+  border-color: var(--accent);
+}
+
+.track-preview-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.tracks-group-head {
+  margin-top: 14px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+
+.tracks-group-head:first-child { margin-top: 0; }
+
+/* Alignment still running — transient, so it reads as information rather than a warning. */
+.track-chip.is-pending-chip {
+  color: var(--text-muted);
+  border-style: dashed;
+}
+
+
+/* The row is a five-column grid, so both of these must be told to behave: the actions are one
+   cell however many buttons they hold, and the chooser drops to its own full-width line rather
+   than being crushed into an implicit sixth column. */
+.track-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Choosing a party for a gallery track. Shown inline on demand rather than picking one
+   silently — adding somebody's song to a room is not a decision to make on their behalf just
+   because the choice happened to be unambiguous. */
+.track-party-choice {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-medium);
+}
+
+.track-party-choice .account-muted {
+  font-size: 12px;
+}
+
+.track-choice-cancel {
+  margin-left: auto;
+}
+
+.track-delete {
+  color: var(--accent);
+}
+
+/* The host's one-off party card keeps its schedule editable after creation. */
+.host-party-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+
+.host-party-schedule {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.host-party-time {
+  max-width: 190px;
+  min-height: 36px;
+}
+
+@media (max-width: 680px) {
+  .host-party-actions { justify-content: flex-start; }
+  .host-party-schedule { width: 100%; }
+  .host-party-time { flex: 1; max-width: none; }
+}
+
+/* ── Tools → AI zone: MCP connections and personal API keys ── */
+.ai-zone[hidden] {
+  display: none;
+}
+
+.ai-zone .ai-zone-card:first-child {
+  margin-top: 0;
+}
+
+.api-key-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.api-key-add {
+  margin-top: 14px;
+}
+
+.api-key-add[hidden],
+.api-key-add-form[hidden],
+.api-key-provider-field[hidden] {
+  display: none;
+}
+
+.api-key-add-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-subtle);
+}
+
+.api-key-add-form label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.api-key-add-form label em {
+  color: var(--text-muted);
+  font-style: normal;
+}
+
+.api-key-add-form input,
+.api-key-add-form select {
+  width: 100%;
+  min-width: 0;
+}
+
+.api-key-provider-hint {
+  margin: 0;
+  font-size: 12px;
+}
+
+.api-key-card {
+  padding: 16px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-subtle);
+}
+
+.api-key-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.api-key-head > div > span:not(.track-chip),
+.api-key-facts {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.api-key-count {
+  color: var(--text-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.api-key-note,
+.api-key-none {
+  margin: 12px 0 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.api-key-row {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.api-key-default {
+  margin-left: 6px;
+  font-size: 11px;
+  padding: 2px 8px;
+}
+
+.api-key-mask {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: 0.08em;
+}
+
+.api-key-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.api-key-card a,
+.api-key-provider-hint a {
+  color: var(--accent);
+}
+
+.api-key-actions .btn-secondary,
+.api-key-edit .btn-primary,
+.api-key-edit .btn-secondary {
+  padding: 8px 14px;
+  font-size: 11px;
+}
+
+.api-key-edit {
+  flex-wrap: wrap;
+}
+
+.api-key-rejected {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .api-key-head { flex-direction: column; gap: 8px; }
+}
+
+/* tools.html: the Tools page has no tab row above its panel, so the panel keeps its top padding. */
+.tools-shell .admin-panel { padding-top: var(--panel-pad); }

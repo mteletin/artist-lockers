@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="/ai-tlt/ui/v1/tokens.css">
+<link rel="stylesheet" href="/ai-tlt/ui/v1/base.css">
+<script src="/app/product-adapter.js" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tools | Artist Lockers</title>
+<meta name="description" content="Image and video tools for your work.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/css/styles.css?v=20261001-mobile-ux-1">
+<link rel="stylesheet" href="assets/css/confirm-dialog.css?v=20260808-dialog-1">
+<link rel="stylesheet" href="assets/css/account2.css?v=20261001-tools-page-1">
+<link rel="stylesheet" href="assets/css/account-h3.css?v=20260930-extend-plus-1">
+<script src="assets/js/asset-picker.js?v=20260929-picker-1" defer></script>
+<script src="assets/js/confirm-dialog.js?v=20260807-confirm-1" defer></script>
+<script src="assets/js/account-tools-tabs.js?v=20261001-tools-page-1" defer></script>
+<script src="assets/js/gen-models.js?v=20260930-models-1" defer></script>
+<script src="assets/js/account-gen-shared.js?v=20261022-permissions-1" defer></script>
+<script src="assets/js/account-h3.js?v=20260930-extend-plus-1" defer></script>
+<script src="assets/js/account-image.js?v=20260927-share-rename-1" defer></script>
+<script src="assets/js/account-ai.js?v=20261005-key-enabled-1" defer></script>
+<link rel="stylesheet" href="assets/css/mobile.css?v=20261001-mobile-ux-1">
+<link rel="stylesheet" href="/app/artistlockers.css">
+<script type="module" src="/app/tools-shell.js"></script>
+</head>
+<body class="al-tools-page">
+<div id="alHeader"></div>
+
+<main class="auth-shell admin-shell tools-shell">
+  <section class="account-panel admin-panel" aria-labelledby="toolsPageTitle">
+    <div class="section-label">Your studio</div>
+    <h1 class="account-title" id="toolsPageTitle">Tools</h1>
+    <p class="account-status" id="toolsPageStatus" role="status" hidden></p>
+    <div class="admin-tab-panel is-visible" id="panelTools">
+      <!-- Second tab row: one sub-tab per tool. account-tools-tabs.js switches the .tools-subpanel
+           blocks; the Video Generation and Image Generator tabs stay hidden until account-h3.js and
+           account-image.js resolve the Production/ToolsAccess role gate. -->
+      <div class="tools-subtabs" id="toolsSubtabs" role="tablist" aria-label="Tools">
+        <button class="tools-subtab" type="button" data-tool="h3" role="tab" aria-selected="false" hidden>Video Generation</button>
+        <button class="tools-subtab" type="button" data-tool="image" role="tab" aria-selected="false" hidden>Image Generator</button>
+        <button class="tools-subtab" type="button" data-tool="ai" role="tab" aria-selected="false" hidden>AI zone</button>
+      </div>
+
+      <div class="tools-subpanel" id="toolsPanelH3" data-tool-panel="h3">
+      <!-- Video Generation studio: MiniMax H3 on our GPUs, and the Seevio cloud models for users who saved a key in the
+           AI zone. Hidden until the Production role gate resolves (admin included). -->
+      <section class="h3-studio" id="h3Studio" aria-labelledby="h3StudioTitle" hidden>
+        <div class="tools-section-head">
+          <div>
+            <div class="tools-kicker">Reference-to-video</div>
+            <h3 id="h3StudioTitle">Video Generation</h3>
+          </div>
+          <div class="h3-head-actions">
+            <button class="btn-ghost h3-bell" id="h3BellToggle" type="button" aria-pressed="true" title="Chime when a render finishes">&#128276;</button>
+            <span class="account-status" id="h3Status" role="status"></span>
+          </div>
+        </div>
+
+        <div class="h3-queue-block">
+          <div class="h3-queue-head">
+            <span class="h3-queue-label">Render queue</span>
+            <span class="h3-queue-count" id="h3QueueCount"></span>
+          </div>
+          <div class="h3-queue-bar" id="h3QueueBar" role="list" aria-label="Shared render queue"></div>
+          <!-- Card temperatures from the GPU box, refreshed with the state poll. account-h3.js fills it. -->
+          <div class="h3-gpu-strip" id="h3GpuStrip" hidden>
+            <div class="h3-gpu-strip-head">
+              <span class="h3-gpu-strip-title">GPU temps</span>
+              <div class="h3-gpu-mode" id="h3GpuMode" role="group" aria-label="GPU display">
+                <button type="button" class="h3-gpu-mode-tab" data-gpu-mode="bars" aria-pressed="true">bars</button>
+                <button type="button" class="h3-gpu-mode-tab" data-gpu-mode="numbers" aria-pressed="false">numbers</button>
+              </div>
+            </div>
+            <div class="h3-gpu-cards" id="h3GpuCards" role="list" aria-label="GPU temperatures"></div>
+          </div>
+          <div class="h3-queue-legend">
+            <span><i class="h3-swatch is-mine"></i>Yours</span>
+            <span><i class="h3-swatch is-theirs"></i>Someone else</span>
+            <span><i class="h3-swatch is-running"></i>On a GPU · fill = sampler progress</span>
+          </div>
+          <div class="h3-queue-detail" id="h3QueueDetail" hidden></div>
+        </div>
+
+        <div class="h3-grid">
+          <form class="h3-compose" id="h3Form">
+            <label class="h3-field h3-field--inline h3-model-field">
+              <span class="h3-field-label">Model</span>
+              <select id="h3Model"><option value="minimax-h3">MiniMax H3</option></select>
+            </label>
+            <p class="account-muted h3-cloud-note" id="h3CloudNote" hidden></p>
+            <div class="h3-cont-note" id="h3ContNote" hidden>
+              <span id="h3ContText"></span>
+              <button class="btn-ghost h3-cont-clear" id="h3ContClear" type="button" title="Queue an ordinary render instead" aria-label="Cancel Extend+">×</button>
+            </div>
+
+            <div class="h3-idea">
+              <label class="h3-field">
+                <span class="h3-field-label">Your idea</span>
+                <textarea id="h3Idea" rows="3" maxlength="4000"
+                  placeholder="Say what should happen in plain words: who is in the shot, where, what they do, the mood. Attach references first so the specialist can name them."></textarea>
+              </label>
+              <div class="h3-idea-row">
+                <button class="btn-secondary" id="h3Advise" type="button">Write the prompt</button>
+                <span class="account-muted">The specialist drafts a director prompt below from your idea, the attached references and the chosen size and length. Edit it freely afterwards.</span>
+                <span class="account-status" id="h3AdviseStatus" role="status"></span>
+              </div>
+            </div>
+
+            <label class="h3-field">
+              <span class="h3-field-label">Prompt</span>
+              <textarea id="h3Prompt" rows="6" maxlength="8000"
+                placeholder="Describe the shot. Reference an attachment by its tag, e.g. &lt;Picture 1&gt; walks into frame."></textarea>
+            </label>
+            <div class="h3-prompt-meta">
+              <span id="h3PromptCount">0 / 8000</span>
+              <span class="account-muted">Tip: click a reference tag to insert it.</span>
+            </div>
+
+            <div class="h3-rails" id="h3Rails">
+              <div class="h3-rail" data-rail="image">
+                <div class="h3-rail-head"><span>Image references</span><span class="h3-rail-count" data-rail-count="image"></span></div>
+                <div class="h3-rail-slots" data-rail-slots="image"></div>
+              </div>
+              <div class="h3-rail" data-rail="audio">
+                <div class="h3-rail-head"><span>Audio references</span><span class="h3-rail-count" data-rail-count="audio"></span></div>
+                <div class="h3-rail-slots" data-rail-slots="audio"></div>
+              </div>
+              <div class="h3-rail" data-rail="video">
+                <div class="h3-rail-head"><span>Video references</span><span class="h3-rail-count" data-rail-count="video"></span></div>
+                <div class="h3-rail-slots" data-rail-slots="video"></div>
+              </div>
+            </div>
+
+            <div class="h3-basics">
+              <label class="h3-field h3-field--inline">
+                <span class="h3-field-label">Length</span>
+                <input id="h3Length" type="range" min="0" max="1" step="1" value="0">
+                <output id="h3LengthOut" class="h3-out"></output>
+              </label>
+              <label class="h3-field h3-field--inline">
+                <span class="h3-field-label">Size</span>
+                <select id="h3Size"></select>
+                <output id="h3PixelOut" class="h3-out"></output>
+              </label>
+              <label class="h3-field h3-field--inline" id="h3ResolutionField" hidden>
+                <span class="h3-field-label">Resolution</span>
+                <select id="h3Resolution"></select>
+              </label>
+            </div>
+
+            <details class="h3-advanced" id="h3Advanced">
+              <summary>Advanced</summary>
+              <div class="h3-advanced-grid">
+                <label class="h3-field h3-local-only">
+                  <span class="h3-field-label">Flow</span>
+                  <select id="h3Flow">
+                    <option value="auto">By GPU</option>
+                    <option value="standard">Standard</option>
+                    <option value="fused" selected>Fused turbo</option>
+                  </select>
+                </label>
+                <label class="h3-field h3-local-only"><span class="h3-field-label">Sampler</span><select id="h3Sampler"></select></label>
+                <label class="h3-field h3-local-only"><span class="h3-field-label">Scheduler</span><select id="h3Scheduler"></select></label>
+                <label class="h3-field h3-local-only"><span class="h3-field-label">Steps</span><input id="h3Steps" type="number" min="1" max="60" step="1"></label>
+                <label class="h3-field" id="h3SeedField"><span class="h3-field-label">Seed</span><input id="h3Seed" type="text" inputmode="numeric" pattern="[0-9]{1,19}" placeholder="Random"></label>
+                <label class="h3-field" id="h3RefSizeField">
+                  <span class="h3-field-label">Reference size</span>
+                  <select id="h3RefImageSize">
+                    <option value="match">match &mdash; faster</option>
+                    <option value="max" selected>max &mdash; sharper, much slower</option>
+                  </select>
+                </label>
+                <label class="h3-field h3-field--wide h3-local-only">
+                  <span class="h3-field-label">Custom size</span>
+                  <span class="h3-dims">
+                    <input id="h3Width" type="number" step="32" min="256" max="2048">
+                    <span aria-hidden="true">&times;</span>
+                    <input id="h3Height" type="number" step="32" min="256" max="2048">
+                  </span>
+                </label>
+              </div>
+            </details>
+
+            <div class="h3-submit-row">
+              <button class="btn-primary" id="h3Submit" type="submit">Queue render</button>
+              <span class="h3-slots" id="h3Slots"></span>
+            </div>
+          </form>
+
+          <div class="h3-preview">
+            <div class="h3-preview-head">
+              <span class="tools-kicker">Preview</span>
+              <span class="h3-preview-title" id="h3PreviewTitle">Nothing rendered yet</span>
+            </div>
+            <div class="h3-preview-stage" id="h3PreviewStage">
+              <div class="h3-preview-empty">Your finished render appears here.</div>
+            </div>
+            <div class="h3-preview-frames" id="h3PreviewFrames" hidden></div>
+            <div class="h3-preview-actions" id="h3PreviewActions" hidden>
+              <a class="btn-secondary" id="h3PreviewDownload" download>Download</a>
+              <button class="btn-ghost" id="h3PreviewShare" type="button">Send to Shared Media Assets</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="h3-lists">
+          <section class="h3-list" aria-labelledby="h3MineTitle">
+            <div class="h3-list-head">
+              <h4 id="h3MineTitle">Your jobs</h4>
+              <span class="account-muted" id="h3MineHint"></span>
+            </div>
+            <div class="h3-job-list" id="h3JobsList"></div>
+          </section>
+          <section class="h3-list" aria-labelledby="h3ShelfTitle">
+            <div class="h3-list-head">
+              <h4 id="h3ShelfTitle">Recent results</h4>
+              <button class="btn-ghost h3-small-btn" id="h3ClearNew" type="button">Mark all seen</button>
+            </div>
+            <div class="h3-shelf" id="h3Shelf"></div>
+          </section>
+        </div>
+      </section>
+      </div>
+
+      <div class="tools-subpanel" id="toolsPanelImage" data-tool-panel="image">
+      <!-- Image Generator studio (Qwen-Image 2.1 for now), on the same queue as Video Generation.
+           Hidden until the Production role gate resolves (admin included). account-image.js fills it. -->
+      <section class="h3-studio img-studio" id="imgStudio" aria-labelledby="imgStudioTitle" hidden>
+        <div class="tools-section-head">
+          <div>
+            <div class="tools-kicker">Text and reference to image</div>
+            <h3 id="imgStudioTitle">Image Generator</h3>
+          </div>
+          <div class="h3-head-actions">
+            <button class="btn-ghost h3-bell" id="imgBellToggle" type="button" aria-pressed="true" title="Chime when a render finishes">&#128276;</button>
+            <span class="account-status" id="imgStatus" role="status"></span>
+          </div>
+        </div>
+
+        <div class="h3-queue-block">
+          <div class="h3-queue-head">
+            <span class="h3-queue-label">Render queue</span>
+            <span class="h3-queue-count" id="imgQueueCount"></span>
+          </div>
+          <div class="h3-queue-bar" id="imgQueueBar" role="list" aria-label="Shared render queue"></div>
+          <div class="h3-gpu-strip" id="imgGpuStrip" hidden>
+            <div class="h3-gpu-strip-head">
+              <span class="h3-gpu-strip-title">GPU temps</span>
+              <div class="h3-gpu-mode" id="imgGpuMode" role="group" aria-label="GPU display">
+                <button type="button" class="h3-gpu-mode-tab" data-gpu-mode="bars" aria-pressed="true">bars</button>
+                <button type="button" class="h3-gpu-mode-tab" data-gpu-mode="numbers" aria-pressed="false">numbers</button>
+              </div>
+            </div>
+            <div class="h3-gpu-cards" id="imgGpuCards" role="list" aria-label="GPU temperatures"></div>
+          </div>
+          <div class="h3-queue-legend">
+            <span><i class="h3-swatch is-mine"></i>Yours</span>
+            <span><i class="h3-swatch is-theirs"></i>Someone else</span>
+            <span><i class="h3-swatch is-running"></i>On a GPU · fill = sampler progress</span>
+          </div>
+          <div class="h3-queue-detail" id="imgQueueDetail" hidden></div>
+        </div>
+
+        <div class="h3-grid">
+          <form class="h3-compose" id="imgForm">
+            <label class="h3-field h3-field--inline h3-model-field">
+              <span class="h3-field-label">Model</span>
+              <select id="imgModel"><option value="qwen-image-2.1">Qwen-Image 2.1</option></select>
+            </label>
+
+            <div class="h3-field img-mode-field">
+              <span class="h3-field-label">Mode</span>
+              <div class="h3-picker-tabs img-modes" id="imgModes" role="radiogroup" aria-label="Mode">
+                <button class="h3-picker-tab is-active" type="button" role="radio" aria-checked="true" data-mode="create">Create</button>
+                <button class="h3-picker-tab" type="button" role="radio" aria-checked="false" data-mode="edit">Edit</button>
+                <button class="h3-picker-tab" type="button" role="radio" aria-checked="false" data-mode="transparent">Transparent</button>
+                <button class="h3-picker-tab" type="button" role="radio" aria-checked="false" data-mode="remove-bg">Remove background</button>
+              </div>
+              <span class="account-muted" id="imgModeHint"></span>
+            </div>
+
+            <div class="h3-idea">
+              <label class="h3-field">
+                <span class="h3-field-label">Your idea</span>
+                <textarea id="imgIdea" rows="3" maxlength="4000"
+                  placeholder="Say what the picture should show in plain words: subject, setting, style, light, any text on it. Attach references first so the specialist can name them."></textarea>
+              </label>
+              <div class="h3-idea-row">
+                <button class="btn-secondary" id="imgAdvise" type="button">Write the prompt</button>
+                <span class="account-muted">The specialist drafts a prompt below from your idea, the mode, the attached pictures and the aspect. Edit it freely afterwards.</span>
+                <span class="account-status" id="imgAdviseStatus" role="status"></span>
+              </div>
+            </div>
+
+            <label class="h3-field">
+              <span class="h3-field-label">Prompt</span>
+              <textarea id="imgPrompt" rows="6" maxlength="8000"
+                placeholder="Describe the picture. Reference an attachment by its tag, e.g. the jacket from &lt;image1&gt; on the singer in &lt;image2&gt;."></textarea>
+            </label>
+            <div class="h3-prompt-meta">
+              <span id="imgPromptCount">0 / 8000</span>
+              <span class="account-muted">Tip: click a reference tag to insert it.</span>
+            </div>
+
+            <div class="h3-rails" id="imgRails">
+              <div class="h3-rail" data-rail="image">
+                <div class="h3-rail-head"><span>Image references</span><span class="h3-rail-count" data-rail-count="image"></span></div>
+                <div class="h3-rail-slots" data-rail-slots="image"></div>
+              </div>
+            </div>
+
+            <div class="h3-basics">
+              <label class="h3-field h3-field--inline">
+                <span class="h3-field-label">Aspect</span>
+                <select id="imgAspect"></select>
+                <output id="imgSizeOut" class="h3-out"></output>
+              </label>
+              <label class="h3-field h3-field--inline">
+                <span class="h3-field-label">Quality</span>
+                <select id="imgQuality">
+                  <option value="1024" selected>1K &mdash; about 15 s</option>
+                  <option value="2048">2K &mdash; about 5 min</option>
+                </select>
+              </label>
+              <label class="h3-field h3-field--inline">
+                <span class="h3-field-label">Variants</span>
+                <select id="imgVariants">
+                  <option value="1" selected>1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                </select>
+                <span class="account-muted">Each variant is its own job, one seed apart.</span>
+              </label>
+            </div>
+
+            <details class="h3-advanced">
+              <summary>Advanced</summary>
+              <div class="h3-advanced-grid">
+                <label class="h3-field"><span class="h3-field-label">Sampler</span><select id="imgSampler"></select></label>
+                <label class="h3-field"><span class="h3-field-label">Scheduler</span><select id="imgScheduler"></select></label>
+                <label class="h3-field"><span class="h3-field-label">Steps</span><input id="imgSteps" type="number" min="1" max="60" step="1"></label>
+                <label class="h3-field"><span class="h3-field-label">CFG</span><input id="imgCfg" type="number" min="1" max="10" step="0.5" placeholder="Auto"></label>
+                <label class="h3-field"><span class="h3-field-label">Seed</span><input id="imgSeed" type="text" inputmode="numeric" pattern="[0-9]{1,19}" placeholder="Random"></label>
+                <label class="h3-field h3-field--wide">
+                  <span class="h3-field-label">Negative prompt</span>
+                  <textarea id="imgNegative" rows="2" maxlength="8000" placeholder="What to keep out of the picture (optional)."></textarea>
+                </label>
+              </div>
+            </details>
+
+            <div class="h3-submit-row">
+              <button class="btn-primary" id="imgSubmit" type="submit">Generate</button>
+              <span class="h3-slots" id="imgSlots"></span>
+            </div>
+          </form>
+
+          <div class="h3-preview">
+            <div class="h3-preview-head">
+              <span class="tools-kicker">Preview</span>
+              <span class="h3-preview-title" id="imgPreviewTitle">Nothing generated yet</span>
+            </div>
+            <div class="h3-preview-stage img-stage" id="imgPreviewStage">
+              <div class="h3-preview-empty">Your finished picture appears here.</div>
+            </div>
+            <div class="h3-preview-actions" id="imgPreviewActions" hidden>
+              <a class="btn-secondary" id="imgPreviewDownload" download>Download</a>
+              <button class="btn-ghost" id="imgPreviewUse" type="button">Use as reference</button>
+              <button class="btn-ghost" id="imgPreviewShare" type="button">Send to Shared Media Assets</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="h3-lists">
+          <section class="h3-list" aria-labelledby="imgMineTitle">
+            <div class="h3-list-head">
+              <h4 id="imgMineTitle">Your jobs</h4>
+              <span class="account-muted" id="imgMineHint"></span>
+            </div>
+            <div class="h3-job-list" id="imgJobsList"></div>
+          </section>
+          <section class="h3-list" aria-labelledby="imgShelfTitle">
+            <div class="h3-list-head">
+              <h4 id="imgShelfTitle">Recent results</h4>
+              <button class="btn-ghost h3-small-btn" id="imgClearNew" type="button">Mark all seen</button>
+            </div>
+            <div class="h3-shelf" id="imgShelf"></div>
+          </section>
+        </div>
+      </section>
+      </div>
+
+      <div class="tools-subpanel" id="toolsPanelAi" data-tool-panel="ai">
+      <!-- AI zone: MCP connections and the user's own provider keys. account-ai.js reveals the tab once the
+           operator gate passes; the server enforces the same gate on every route. -->
+      <div class="ai-zone" id="aiZone" hidden>
+
+
+        <section class="persona-publisher-panel ai-zone-card" aria-labelledby="apiKeysTitle">
+          <div class="account-subhead">
+            <div>
+              <div class="admin-section-heading" id="apiKeysTitle">API keys</div>
+              <p class="account-muted">Your own keys for the cloud models, one or more per provider. Keys start off. Enable the default key to allow renders from the video tool, billed to your account there. A saved key is never shown again; only its name and last four characters.</p>
+            </div>
+            <span class="account-status" id="apiKeyStatus" role="status"></span>
+          </div>
+          <button class="btn-primary api-key-add" id="apiKeyAdd" type="button" hidden>Add key</button>
+          <form class="api-key-add-form" id="apiKeyAddForm" autocomplete="off" hidden>
+            <label class="api-key-provider-field">
+              <span>Provider</span>
+              <select name="provider"></select>
+            </label>
+            <p class="account-muted api-key-provider-hint"></p>
+            <label>
+              <span>Name <em>(optional)</em></span>
+              <input type="text" name="label" maxlength="60" placeholder="e.g. Personal, Studio">
+            </label>
+            <label>
+              <span>Key</span>
+              <input type="password" name="key" autocomplete="off" spellcheck="false" maxlength="512" placeholder="Paste your key">
+            </label>
+            <div class="api-key-actions">
+              <button class="btn-primary" type="submit">Save key</button>
+              <button class="btn-secondary" type="button" data-action="cancel-add">Cancel</button>
+            </div>
+          </form>
+          <div class="api-key-list" id="apiKeyList">
+            <div class="admin-empty">Loading...</div>
+          </div>
+        </section>
+      </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,132 @@
+/*
+ * AI-TLT UI v1 — design tokens.
+ * The only file with literal colors. Products copy /ai-tlt/ui/v1 and override these custom properties
+ * (usually in their own stylesheet loaded after this one); components use nothing but var(--ait-*).
+ * Dark is the default; light applies through prefers-color-scheme unless [data-theme="dark"] is set,
+ * and always under [data-theme="light"].
+ */
+:root {
+  color-scheme: dark;
+
+  --ait-font-sans: "Inter", "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --ait-font-mono: "JetBrains Mono", "Cascadia Code", ui-monospace, "SF Mono", Consolas, monospace;
+
+  --ait-bg: #0d0f14;
+  --ait-bg-raised: #141821;
+  --ait-surface: #181d28;
+  --ait-surface-2: #1f2533;
+  --ait-surface-hover: #252c3c;
+  --ait-border: #2a3142;
+  --ait-border-strong: #3a4459;
+  --ait-text: #e9ecf3;
+  --ait-text-muted: #9aa3b5;
+  --ait-text-faint: #6c7589;
+
+  --ait-accent: #7c8cff;
+  --ait-accent-strong: #98a4ff;
+  --ait-accent-soft: rgba(124, 140, 255, 0.14);
+  --ait-on-accent: #0b0d18;
+
+  --ait-success: #3ecf8e;
+  --ait-success-soft: rgba(62, 207, 142, 0.14);
+  --ait-warning: #f5b84b;
+  --ait-warning-soft: rgba(245, 184, 75, 0.14);
+  --ait-danger: #ff6b7a;
+  --ait-danger-soft: rgba(255, 107, 122, 0.14);
+  --ait-info: #5cc8ff;
+  --ait-info-soft: rgba(92, 200, 255, 0.12);
+
+  --ait-discord: #5865f2;
+  --ait-on-discord: #ffffff;
+
+  --ait-overlay: rgba(5, 6, 10, 0.66);
+  --ait-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 8px 24px rgba(0, 0, 0, 0.28);
+  --ait-shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.5);
+  --ait-glow: radial-gradient(1200px 600px at 15% -10%, rgba(124, 140, 255, 0.16), transparent 60%),
+              radial-gradient(900px 500px at 110% 10%, rgba(62, 207, 142, 0.08), transparent 60%);
+
+  --ait-radius-sm: 6px;
+  --ait-radius: 10px;
+  --ait-radius-lg: 16px;
+  --ait-radius-pill: 999px;
+
+  --ait-space-1: 4px;
+  --ait-space-2: 8px;
+  --ait-space-3: 12px;
+  --ait-space-4: 16px;
+  --ait-space-5: 24px;
+  --ait-space-6: 32px;
+  --ait-space-7: 48px;
+
+  --ait-gutter: 16px;
+  --ait-content-max: 1120px;
+  --ait-topbar-h: 60px;
+  --ait-focus: 0 0 0 3px rgba(124, 140, 255, 0.45);
+  --ait-transition: 140ms ease;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --ait-bg: #f5f6f9;
+    --ait-bg-raised: #ffffff;
+    --ait-surface: #ffffff;
+    --ait-surface-2: #f0f2f7;
+    --ait-surface-hover: #e9ecf3;
+    --ait-border: #dfe3ec;
+    --ait-border-strong: #c7cdda;
+    --ait-text: #151a24;
+    --ait-text-muted: #556074;
+    --ait-text-faint: #7d879a;
+    --ait-accent: #4a5bea;
+    --ait-accent-strong: #3343d6;
+    --ait-accent-soft: rgba(74, 91, 234, 0.1);
+    --ait-on-accent: #ffffff;
+    --ait-success: #12955f;
+    --ait-success-soft: rgba(18, 149, 95, 0.1);
+    --ait-warning: #b7740c;
+    --ait-warning-soft: rgba(183, 116, 12, 0.1);
+    --ait-danger: #d7354a;
+    --ait-danger-soft: rgba(215, 53, 74, 0.09);
+    --ait-info: #0a7fbf;
+    --ait-info-soft: rgba(10, 127, 191, 0.09);
+    --ait-overlay: rgba(20, 24, 34, 0.42);
+    --ait-shadow: 0 1px 2px rgba(20, 26, 40, 0.06), 0 8px 24px rgba(20, 26, 40, 0.07);
+    --ait-shadow-lg: 0 24px 64px rgba(20, 26, 40, 0.18);
+    --ait-glow: radial-gradient(1200px 600px at 15% -10%, rgba(74, 91, 234, 0.08), transparent 60%),
+                radial-gradient(900px 500px at 110% 10%, rgba(18, 149, 95, 0.05), transparent 60%);
+    --ait-focus: 0 0 0 3px rgba(74, 91, 234, 0.3);
+  }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --ait-bg: #f5f6f9;
+  --ait-bg-raised: #ffffff;
+  --ait-surface: #ffffff;
+  --ait-surface-2: #f0f2f7;
+  --ait-surface-hover: #e9ecf3;
+  --ait-border: #dfe3ec;
+  --ait-border-strong: #c7cdda;
+  --ait-text: #151a24;
+  --ait-text-muted: #556074;
+  --ait-text-faint: #7d879a;
+  --ait-accent: #4a5bea;
+  --ait-accent-strong: #3343d6;
+  --ait-accent-soft: rgba(74, 91, 234, 0.1);
+  --ait-on-accent: #ffffff;
+  --ait-success: #12955f;
+  --ait-success-soft: rgba(18, 149, 95, 0.1);
+  --ait-warning: #b7740c;
+  --ait-warning-soft: rgba(183, 116, 12, 0.1);
+  --ait-danger: #d7354a;
+  --ait-danger-soft: rgba(215, 53, 74, 0.09);
+  --ait-info: #0a7fbf;
+  --ait-info-soft: rgba(10, 127, 191, 0.09);
+  --ait-overlay: rgba(20, 24, 34, 0.42);
+  --ait-shadow: 0 1px 2px rgba(20, 26, 40, 0.06), 0 8px 24px rgba(20, 26, 40, 0.07);
+  --ait-shadow-lg: 0 24px 64px rgba(20, 26, 40, 0.18);
+  --ait-glow: radial-gradient(1200px 600px at 15% -10%, rgba(74, 91, 234, 0.08), transparent 60%),
+              radial-gradient(900px 500px at 110% 10%, rgba(18, 149, 95, 0.05), transparent 60%);
+  --ait-focus: 0 0 0 3px rgba(74, 91, 234, 0.3);
+}

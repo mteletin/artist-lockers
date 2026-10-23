@@ -12,3 +12,5 @@ appsettings.Production.json
 *.key
 *.pfx
 *.log
+out/
+node_modules/

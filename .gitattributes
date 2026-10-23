@@ -1,0 +1,6 @@
+* text=auto
+*.cs text eol=crlf
+*.sh text eol=lf
+*.service text eol=lf
+*.py text eol=lf
+**/vendor/** -whitespace

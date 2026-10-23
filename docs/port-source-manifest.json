@@ -1,0 +1,91 @@
+{
+  "origin": "successor repositories only; no production data copied",
+  "codexFiles": [
+    {
+      "source": "ai-tlt-mobvision/mv3/assets/css/styles.css",
+      "sha256": "e95f44f333d5c70fd9ff2fd52d086ec314c5f4cff274d29d3c5eb9e8b8f0abc8"
+    },
+    {
+      "source": "ai-tlt-mobvision/mv3/assets/css/codex.css",
+      "sha256": "53fef3809fce02e2cc8649271fe71a3f375bda91ff73845f742182460e32ec19"
+    },
+    {
+      "source": "ai-tlt-mobvision/mv3/assets/css/confirm-dialog.css",
+      "sha256": "d696435b35efd5a76d981686a3380ae72bfd440ba7eed1003fc8806afc6b9004"
+    },
+    {
+      "source": "ai-tlt-mobvision/mv3/assets/css/mobile.css",
+      "sha256": "15ea12a2c37a86e21c39b340ef652d467664aca98a33df8a539202641486236e"
+    },
+    {
+      "source": "ai-tlt-mobvision/mv3/assets/js/asset-picker.js",
+      "sha256": "85e967634ae83260514644e38e6b9d4d7796d964cd3f3b533addbe3d5344e371"
+    },
+    {
+      "source": "ai-tlt-mobvision/mv3/assets/js/confirm-dialog.js",
+      "sha256": "743a14822995ab00f8f28a07806df0f6fd438b327323aaf8ad3c8e5bde163ba8"
+    },
+    {
+      "source": "ai-tlt-mobvision/mv3/assets/vendor/codex-editor.min.js",
+      "sha256": "aca4359643786a9a4a40fad09cc42fa4b128b8a9372f812497f399876555527d"
+    },
+    {
+      "source": "ai-tlt-mobvision/mv3/assets/js/codex-cut.js",
+      "sha256": "b07698aebae56d6fc8de5795949869e7543bf61cb009602b1330852ad4bb473a"
+    },
+    {
+      "source": "ai-tlt-mobvision/mv3/assets/js/gen-models.js",
+      "sha256": "9de0822b26f8d903ca5bd6499c0428f0a305ce3f561e4c2ac4eb6f3d5f1613ec"
+    },
+    {
+      "source": "ai-tlt-mobvision/mv3/assets/js/codex-shot-prompts.js",
+      "sha256": "7523ab8f5fba197166b83601a90a28d81c0034e58d3c3c5da94bc22c261e2238"
+    },
+    {
+      "source": "ai-tlt-mobvision/mv3/assets/js/codex-storyboard.js",
+      "sha256": "1d65c2953a5beb5345e13b1bdc39a71ae17e730198c23822f412300113899db8"
+    },
+    {
+      "source": "ai-tlt-mobvision/mv3/assets/js/codex-genimage.js",
+      "sha256": "bda346469d6822988ad69635d07641f6b035d6085467ce62c3d2f5623ec0bc48"
+    },
+    {
+      "source": "ai-tlt-mobvision/mv3/assets/js/codex.js",
+      "sha256": "cc95cf0b8ae3352dca5b08382ae31c5b4cd19d4644a0ff5b5d1ee052a57aab30"
+    }
+  ],
+  "toolsFiles": [
+    {
+      "source": "ai-tlt-mobvision/mv3/assets/css/account2.css",
+      "sha256": "b84ec915203900667b0886236ea0002b65e1e9463d3b690ebe82fd36d54149f1"
+    },
+    {
+      "source": "ai-tlt-mobvision/mv3/assets/css/account-h3.css",
+      "sha256": "2130a872048a5aa4a66af7d24aec47914c3ec669ec18358fe8ac45a83a775124"
+    },
+    {
+      "source": "ai-tlt-mobvision/mv3/assets/js/account-tools-tabs.js",
+      "sha256": "4375f74127cbae9164789fcfdd64b487086286ab47e432c5043d847ef77798bb"
+    },
+    {
+      "source": "ai-tlt-mobvision/mv3/assets/js/account-gen-shared.js",
+      "sha256": "40dd67d6f9c01938c2aef6c2d04935c2316d7e156f2c36aa769903b9b93e9ae0"
+    },
+    {
+      "source": "ai-tlt-mobvision/mv3/assets/js/account-h3.js",
+      "sha256": "7d5888e65bfc1254814731c3520e398c08aea07399f9b17177629ab97245f757"
+    },
+    {
+      "source": "ai-tlt-mobvision/mv3/assets/js/account-image.js",
+      "sha256": "6668bd0184f0ce583954470b757ed9ee5243882482553478d83a461d412b285e"
+    },
+    {
+      "source": "ai-tlt-mobvision/mv3/assets/js/account-ai.js",
+      "sha256": "726cc796e082a4e1e5b02d8cf37c000295b49bc52cd5def8d1ccc46ab1d93f29"
+    },
+    {
+      "source": "ai-tlt-mobvision/mv3/tools.html",
+      "sha256": "fbe57d3e46ad0267b6c37f58457f683b92bdae11dc944af1a3d2aebce5d3a8f9"
+    }
+  ]
+}
