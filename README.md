@@ -6,7 +6,7 @@ The first slice contains Profile, Gallery, Tools and the complete Mobvision Code
 
 ## Local checks
 
-Sibling `ai-tlt-platform` and `ai-tlt-identity` checkouts are required; .NET 10 is the target runtime.
+Sibling `ai-tlt-platform` and `ai-tlt-identity` checkouts are required; .NET 10 is the target runtime. `build-dependencies.json` records the base revisions. The shared Accounts app-inventory changes are still uncommitted in the current Identity working tree, so the Identity pin must be updated before this draft builds from a fresh remote checkout.
 
 ```powershell
 dotnet build src/AiTlt.ArtistLockers.Host
