@@ -4,9 +4,34 @@ The creator product at https://artistlockers.eu, with its own host and square si
 
 The first slice contains Profile, Gallery, Tools and the complete Mobvision Codex editor port. Locker and Exposition are labelled placeholders. See the [product brief](docs/product-and-first-slice.md) and [deployment runbook/status](docs/deployment.md), including the Audio Remaster boundary.
 
-## Local checks
+## Develop the UI on its own
 
-Sibling `ai-tlt-platform` and `ai-tlt-identity` checkouts are required; .NET 10 is the target runtime. `build-dependencies.json` records the base revisions. The shared Accounts app-inventory changes are still uncommitted in the current Identity working tree, so the Identity pin must be updated before this draft builds from a fresh remote checkout.
+Clone **only this repository**, install Node.js 22 or later, and run:
+
+```sh
+npm run dev
+```
+
+Open **http://127.0.0.1:5088**. No `npm install`, .NET SDK, sibling repositories, database, credentials, or running AI-TLT
+services are needed. The mock host serves the real UI files directly; edit HTML/CSS/JavaScript under
+`src/AiTlt.ArtistLockers.Host/wwwroot` and refresh the browser.
+
+The **DEMO** badge opens developer controls for Member, Creator, Administrator, signed-out, empty and error scenarios,
+plus simulated API latency. Profile/media/Codex edits and mock jobs work in memory. Restart or reset to start fresh.
+Use `demo-seevio-key` in Tools → AI zone to try personal-key video generation; it never contacts a provider.
+
+```sh
+npm run dev:member
+npm run dev -- --port 5090 --scenario empty
+npm run test:dev
+```
+
+See [UI development](docs/ui-development.md) for mock coverage, troubleshooting and browser checks.
+
+## Run the integration host
+
+The production .NET host requires sibling `ai-tlt-platform` and `ai-tlt-identity` checkouts. .NET 10 is the target runtime;
+`build-dependencies.json` records the tested revisions. This is separate from the dependency-free UI workflow above.
 
 ```powershell
 dotnet build src/AiTlt.ArtistLockers.Host

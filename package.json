@@ -1,0 +1,10 @@
+{
+  "name": "artist-lockers-ui",
+  "private": true,
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "dev": "node --watch dev/server.mjs",
+    "dev:member": "node --watch dev/server.mjs --persona member",
+    "test:dev": "node --test dev/server.test.mjs"
+  }
+}

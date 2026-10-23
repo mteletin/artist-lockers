@@ -1,0 +1,22 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Artist Lockers · Developer controls</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#e9e7e1;color:#30322f;font:16px/1.6 system-ui}main{max-width:780px;margin:6vh auto;padding:24px}h1{font-weight:400;line-height:1.2}h2{font-size:18px;font-weight:500}a{color:#805031}section{padding:24px;border:1px solid #bdbeb6;background:#f3f1eb;margin:24px 0}label{display:block;margin:16px 0}select,button{font:inherit;border:1px solid #aaa99f;background:#faf9f5;color:inherit;padding:12px;min-height:46px}select{display:block;width:100%;margin-top:6px}button{cursor:pointer}button.primary{background:#8e6040;color:white;border-color:#8e6040}nav{display:flex;gap:18px;flex-wrap:wrap}pre{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere}.actions{display:flex;gap:12px;flex-wrap:wrap}.label{font-size:12px;letter-spacing:3px;color:#805031}#status{min-height:26px}small{color:#65685f}
+</style><main><p class="label">ARTIST LOCKERS / LOCAL DEVELOPMENT</p><h1>Build the interface.<br>Leave the infrastructure aside.</h1>
+<p>This process serves the real application UI with fictional, editable data. It never calls Accounts, AI services, a database or a real API provider.</p>
+<nav><a href="/">Landing / Exposition</a><a href="/#/profile">Profile</a><a href="/#/gallery">Gallery</a><a href="/tools.html">Tools</a><a href="/codex.html">Codex</a></nav>
+<section><form id="controls"><label>View as<select name="persona"><option value="member">Artist Lockers Member · personal-key tools</option><option value="creator">Artist Lockers Creator · local H3/Qwen too</option><option value="administrator">Administrator + Creator · product administration</option><option value="signed-out">Signed out · minimal landing</option></select></label>
+<label>Data scenario<select name="scenario"><option value="normal">Populated demo</option><option value="empty">Empty libraries and documents</option><option value="error">Simulated API failures</option></select></label>
+<label>API response delay<select name="delay"><option value="0">None</option><option value="400">400 ms</option><option value="1200">1.2 seconds · loading states</option><option value="2000">2 seconds</option></select></label>
+<p><small>Changing scenarios resets this browser's data. Persona/delay changes keep your edits. Other browser sessions are independent. Restarting the server clears everything.</small></p>
+<div class="actions"><button class="primary">Apply and open app</button><button type="button" id="reset">Reset fictional data</button></div><p role="status" id="status"></p></form></section>
+<section><h2>What you can try</h2><p>Edit a profile, create artists/personas, upload small media, save Codex pages and shots, or queue a synthetic render/remaster. Jobs finish after a short simulated delay. In AI zone use a fictional key such as <code>demo-seevio-key</code> to reveal cloud video models.</p><p>Uploads stay in memory (8 MiB per request / 32 MiB per session). No real OAuth, AI output, publishing, billing or collaboration is provided. Unknown mock routes return an explicit error so missing contracts remain visible.</p></section>
+<section><h2>Recent mock API requests</h2><pre id="requests">Loading…</pre></section></main>
+<script type="module">
+const form=document.querySelector('form'),status=document.querySelector('#status');
+async function load(){const state=await fetch('/__dev/state').then(r=>r.json());for(const key of ['persona','scenario','delay'])form.elements[key].value=state[key];document.querySelector('#requests').textContent=state.requests.join('\n')||'No API requests in this browser session yet.';}
+async function save(reset=false){const response=await fetch('/__dev/state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({persona:form.elements.persona.value,scenario:form.elements.scenario.value,delay:Number(form.elements.delay.value),reset})});if(!response.ok)throw new Error('Developer settings could not be updated.');}
+form.addEventListener('submit',async e=>{e.preventDefault();try{await save();location.assign('/');}catch(error){status.textContent=error.message;}});
+document.querySelector('#reset').onclick=async()=>{try{await save(true);status.textContent='Fictional data reset.';await load();}catch(error){status.textContent=error.message;}};
+load().catch(error=>status.textContent=error.message);
+</script></html>
