@@ -206,7 +206,7 @@ async function showGeneration(dialog, item) {
       h("div", { class: "app-gen-head" }, h("h2", { text: "Generation" }), h("span", { class: "ait-badge", text: modelText(detail.job) }),
         h("a", { class: "ait-small", href: `#/generations?kind=${detail.job.kind}`, text: "All generations" })),
       generationSections(detail, item.filename),
-      ctx.me.canGenerate ? h("div", {class:"ait-row"},
+      ctx.me.canGenerate && (ctx.me.canGenerateLocal || ['seedance-2-5','seedance-2-0','seedance-2-0-fast','seedance-2-0-mini'].includes(detail.job.model)) ? h("div", {class:"ait-row"},
         h("button", {class:"ait-btn ait-btn-sm",type:"button",text:"Repeat",onClick:()=>handoff(detail,true)}),
         h("button", {class:"ait-btn ait-btn-sm",type:"button",text:"Vary",onClick:()=>handoff(detail,false)})) : null));
   } catch (err) {
@@ -416,7 +416,7 @@ function frameTool(item, video, onChange) {
       }
     });
     const extensions = [];
-    if(ctx.me.canGenerate){
+    if(ctx.me.canGenerateLocal){
       const extend = (plus) => h('button',{class:'ait-btn ait-btn-sm',type:'button',text:plus?'Extend+':'Extend',onClick:async event=>{
         const button=event.currentTarget;button.disabled=true;
         try{

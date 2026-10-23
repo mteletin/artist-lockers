@@ -139,7 +139,15 @@
     if (!el.model) return;
     var previous = el.model.value;
     var models = Models.list(limits, 'video');
-    if (!models.length) models = [{ id: Models.H3, label: 'MiniMax H3', provider: 'local' }];
+    if (!models.length && limits.canGenerateLocal !== false) models = [{ id: Models.H3, label: 'MiniMax H3', provider: 'local' }];
+    if (!models.length) {
+      el.model.innerHTML = '<option value="">Add your API key in AI zone</option>';
+      el.model.disabled = true;
+      if (el.submit) el.submit.disabled = true;
+      setStatus('Add your own provider key in AI zone to use Video Generator.');
+      return;
+    }
+    if (el.submit) el.submit.disabled = false;
     el.model.innerHTML = models.map(function (model) {
       var label = model.label + (Models.isCloud(model) ? ' · at ' + Models.providerLabel(model) : '');
       return '<option value="' + escapeHtml(model.id) + '">' + escapeHtml(label) + '</option>';
@@ -153,6 +161,7 @@
   /** Shapes the composer for the picked model, keeping what still fits when switching between cloud models. */
   function applyModel() {
     if (!limits) return;
+    if (limits.canGenerateLocal === false && !Models.list(limits, 'video').length) return;
     var model = currentModel();
     var cloud = Models.isCloud(model);
     var wasCloud = studio.classList.contains('is-cloud');
@@ -724,6 +733,10 @@
   // opts.extendPlus { frame, sourceAssetId, filename, summary } (Extend+): as Extend, but the render continues the clip.
   function reuseJob(job, opts) {
     opts = opts || {};
+    if (limits && limits.canGenerateLocal === false && (!Models.isCloudJob(job) || opts.continueFrom || opts.extendPlus)) {
+      setStatus('Local H3 generation requires Creator access.', true);
+      return;
+    }
     var cont = opts.continueFrom || null;
     var plus = opts.extendPlus || null;
     var missingModel = false;
@@ -889,6 +902,10 @@
   async function submitJob(event) {
     event.preventDefault();
     if (!limits) return;
+    if (limits.canGenerateLocal === false && !Models.list(limits, 'video').some(function (m) { return m.id === el.model.value; })) {
+      setStatus('Add your own provider key in AI zone to use Video Generator.', true);
+      return;
+    }
 
     var prompt = (el.prompt && el.prompt.value || '').trim();
     if (!prompt) {
@@ -1125,7 +1142,7 @@
     Gen.provideComposer('video', reuseJob);
     render(state, null);
     await Gen.refresh();
-    setStatus('');
+    setStatus(limits.canGenerateLocal === false && !Models.list(limits, 'video').length ? 'Add your own provider key in AI zone to use Video Generator.' : '');
   }
 
   // The Tools tab owns the lifecycle: account.js calls loadAccountTools when it first opens,

@@ -4,6 +4,10 @@ namespace AiTlt.ArtistLockers.Hosting;
 
 public sealed class ArtistLockersHostOptions
 {
+    /// <summary>Components included by this product, independently of the member's grants.</summary>
+    public string[] Components { get; set; } = ["profile", "gallery", "studio", "codex"];
+    /// <summary>Operator accounts offered the app switcher; Accounts management permission is also required.</summary>
+    public Guid[] AppSwitcherAccountIds { get; set; } = [];
     /// <summary>Directory for the Data Protection key ring (cookie encryption). Required outside Development.</summary>
     public string? KeysDirectory { get; set; }
     /// <summary>How long a signed-in account read from identity is trusted before it is read again.</summary>

@@ -13,6 +13,9 @@ public sealed record MeDto(PersonDto Account, IReadOnlyList<string> Roles, bool 
 {
     public IReadOnlyList<AccountAppLink> Apps { get; init; } = [];
     public IReadOnlyList<string> Permissions { get; init; } = [];
+    public IReadOnlyList<string> Components { get; init; } = [];
+    public bool CanSwitchApps { get; init; }
+    public bool CanGenerateLocal { get; init; }
 }
 public sealed record DayDto(DateOnly Day, int Count);
 public sealed record SummaryDto(IReadOnlyList<DayDto> Days, IReadOnlyList<string> Tags, int Total);
@@ -35,10 +38,14 @@ public static class LibraryEndpoints
             CancellationToken cancellationToken) =>
         {
             var account = Caller(http);
+            var canSwitchApps = options.AppSwitcherAccountIds.Contains(account.Id)
+                && AiTlt.Identity.ApplicationPermissions.Allows(account.Permissions, "accounts:manage");
             return Results.Ok(new MeDto(new(account.Id, account.DisplayName, account.AvatarUrl), account.Roles,
                 AiTlt.Identity.ApplicationPermissions.Allows(account.Permissions, "accounts:manage"), true, options.LegacySiteUrl, options.AccountsUrl.TrimEnd('/'),
                 ToolsEndpoints.HasAnyPermission(account, options.GeneratePermissions), ToolsEndpoints.HasAnyPermission(account, options.OperatePermissions))
-                { Apps = await identities.AppsAsync(account.Id, cancellationToken), Permissions = account.Permissions });
+                { Apps = canSwitchApps ? await identities.AppsAsync(account.Id, cancellationToken) : [],
+                    CanSwitchApps = canSwitchApps, CanGenerateLocal = GenerationAccess.CanGenerateLocal(account),
+                    Permissions = account.Permissions, Components = options.Components });
         });
 
         api.MapGet("/library/{library}/summary", async (string library, HttpContext http, AssetLibraryClient assets, CancellationToken cancellationToken) =>

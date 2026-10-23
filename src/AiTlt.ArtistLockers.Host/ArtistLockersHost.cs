@@ -42,6 +42,7 @@ public static class ArtistLockersHost
         if (options.UploadTimeoutSeconds is < 30 or > 3600) throw new InvalidOperationException("ArtistLockers:UploadTimeoutSeconds must be between 30 and 3600.");
         if (options.WritesPerHour is < 0 or > 10000) throw new InvalidOperationException("ArtistLockers:WritesPerHour must be between 0 and 10000 (0: no limit).");
         builder.Services.AddSingleton(options);
+        builder.Services.AddSingleton<ArtistRemaster>();
         builder.WebHost.ConfigureKestrel(kestrel =>
         {
             kestrel.AddServerHeader = false;
@@ -186,6 +187,12 @@ public static class ArtistLockersHost
         ToolsEndpoints.Map(app);
         CodexEndpoints.Map(app);
         ProfileEndpoints.Map(app);
+        var remaster=app.MapGroup("/api/v1/tools/remaster-jobs").RequireAuthorization(BrowserPolicy)
+            .AddEndpointFilter((context,next)=>ToolsEndpoints.HasAnyPermission(SignedIn(context.HttpContext)!,context.HttpContext.RequestServices.GetRequiredService<ArtistLockersHostOptions>().GeneratePermissions)?next(context):ValueTask.FromResult<object?>(Results.StatusCode(403)));
+        remaster.MapGet("",(HttpContext http,ArtistRemaster proxy,CancellationToken ct)=>proxy.ForwardAsync(http,SignedIn(http)!.Id));
+        remaster.MapPost("",(HttpContext http,ArtistRemaster proxy,CancellationToken ct)=>proxy.ForwardAsync(http,SignedIn(http)!.Id));
+        remaster.MapDelete("/{id:guid}",(Guid id,HttpContext http,ArtistRemaster proxy)=>proxy.ForwardAsync(http,SignedIn(http)!.Id,"/"+id));
+        remaster.MapGet("/{id:guid}/result",(Guid id,HttpContext http,ArtistRemaster proxy)=>proxy.ForwardAsync(http,SignedIn(http)!.Id,"/"+id+"/result"));
         app.MapMediaProxy();
 
         // The UI routes by hash, but a deep link to any other page path still gets the app; API paths keep their 404.

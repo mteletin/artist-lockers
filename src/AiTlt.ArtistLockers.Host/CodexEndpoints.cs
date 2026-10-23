@@ -86,12 +86,22 @@ public static class CodexEndpoints
         return "/" + string.Join('/', segments.Select(Uri.EscapeDataString)) + query;
     }
 
-    private static async Task ForwardAsync(HttpContext http, CodexProxy codex, ILoggerFactory logs)
+    private static async Task ForwardAsync(HttpContext http, CodexProxy codex, ILoggerFactory logs, ArtistLockersHostOptions options)
     {
         var account = ArtistLockersHost.SignedIn(http) ?? throw new InvalidOperationException("The session check did not run.");
         // Route values arrive decoded, so every segment is escaped again before it goes on.
         if (!AiTlt.Identity.ApplicationPermissions.Allows(account.Permissions, "codex:access")) { await ApiErrors.WriteAsync(http, ApiErrors.ToolsForbidden); return; }
         var path = http.Request.RouteValues["path"] as string ?? "";
+        // A grant does not add TeamBoard to a product that does not include it.
+        var segments = path.Split('/');
+        if (!options.Components.Contains("teamboard", StringComparer.OrdinalIgnoreCase)
+            && (path.Equals("team", StringComparison.OrdinalIgnoreCase)
+                || segments.Any(segment => segment.Equals("tasks", StringComparison.OrdinalIgnoreCase)
+                    || segment.Equals("anchors", StringComparison.OrdinalIgnoreCase))))
+        {
+            await ApiErrors.WriteAsync(http, ApiErrors.NotFound);
+            return;
+        }
         if (Target(path, http.Request.QueryString.Value ?? "") is not { } target)
         {
             await ApiErrors.WriteAsync(http, ApiErrors.NotFound);

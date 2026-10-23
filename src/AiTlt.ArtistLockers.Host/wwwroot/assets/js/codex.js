@@ -20,6 +20,7 @@
   let panelWidth = null, panelWidthKey = null;
   // Every member has the Codex; staff (the Lore and Production teams and the admins) also get the storyboard and generation.
   let staff = false;
+  let hasTeamBoard = false;
   // Every page tree belongs to the owner of its top-level page, who may share it to read or to edit.
   let access = 'none', rootId = null, shares = [], people = null;
 
@@ -121,7 +122,7 @@
     try {
       const saved = key && JSON.parse(localStorage.getItem(key));
       if (saved && Array.isArray(saved.expanded)) expandedPages = new Set(saved.expanded.filter(id => typeof id === 'string'));
-      browserCollapsed = !!(saved && saved.collapsed === true);
+      browserCollapsed = typeof saved?.collapsed === 'boolean' ? saved.collapsed : window.matchMedia('(max-width:720px)').matches;
     } catch (_) { /* A fresh compact tree is the fallback. */ }
     updatePageBrowser();
   }
@@ -184,7 +185,7 @@
         const count = node('span', 'cx-child-count', children.length);
         count.setAttribute('aria-label', children.length + ' sub-pages'); btn.append(count);
       }
-      if (page.tasks) btn.append(node('span', 'cx-count', page.tasks + (page.tasks === 1 ? ' task' : ' tasks')));
+      if (hasTeamBoard && page.tasks) btn.append(node('span', 'cx-count', page.tasks + (page.tasks === 1 ? ' task' : ' tasks')));
       if (current && current.id === page.id) btn.setAttribute('aria-current', 'page');
       btn.addEventListener('click', () => openPage(page.id));
       row.append(btn); li.append(row); parent.append(li);
@@ -383,6 +384,7 @@
 
   // ---------- badges and panels ----------
   function renderBadge(anchorId) {
+    if (!hasTeamBoard) return null;
     const anchor = anchors.find(a => a.id === anchorId);
     if (!anchor) return null;
     const badge = node('span', 'cx-badge'), dot = node('span', 'cx-dot');
@@ -397,6 +399,7 @@
   }
   function roleName(key) { return (team && team.roles.find(r => r.key === key) || {}).displayName || key; }
   function renderPanels() {
+    if (!hasTeamBoard) return;
     const tasks = $('cxPanelTasks'), links = $('cxPanelLinks');
     tasks.textContent = ''; links.textContent = '';
     $('cxTaskCount').textContent = current ? String(anchors.length) : '';
@@ -460,7 +463,7 @@
     if (changed) window.scrollTo({ top: viewScroll[which] ?? viewStart(), behavior: 'instant' });
   }
   async function refreshAnchors() {
-    if (!current) return;
+    if (!hasTeamBoard || !current) return;
     const id = current.id;
     try {
       const fresh = await api('/pages/' + id + '/anchors');
@@ -494,6 +497,7 @@
     const info = selectionInfo(), bubble = $('cxBubble');
     if (!info || !canEdit() || !editor.isFocused && !at) { bubble.hidden = true; return; }
     const task = bubble.querySelector('[data-bubble="task"]');
+    task.hidden = !hasTeamBoard;
     task.disabled = !info.blockId || !team || !team.canCreateTasks;
     task.title = !team || !team.canCreateTasks ? 'Creating board tasks needs a team role.' : !info.blockId ? 'Select text inside one paragraph.' : 'Put this passage on the team board';
     const shot = bubble.querySelector('[data-bubble="shot"]');
@@ -527,6 +531,7 @@
   }
 
   async function ensureTeam() {
+    if (!hasTeamBoard) return { canCreateTasks: false, roles: [], team: [] };
     if (team) return team;
     try { team = await api('/team'); } catch (_) { team = { canCreateTasks: false, roles: [], team: [] }; }
     return team;
@@ -1121,9 +1126,20 @@
       const answer = res.ok ? await res.json() : null;
       allowed = !!answer && answer.allowed === true;
       staff = allowed && answer.staff === true;
+      if (allowed) {
+        const host = await fetch('/api/v1/me', { credentials: 'include', headers: { Accept: 'application/json' } });
+        if (!host.ok) throw new Error('Host unavailable');
+        const me = await host.json();
+        hasTeamBoard = Array.isArray(me.components) && me.components.includes('teamboard');
+      }
     } catch (_) { access.lastElementChild.textContent = 'The Codex is not reachable right now. Try again in a moment.'; return; }
     if (!allowed) { access.lastElementChild.textContent = 'The Codex did not open for this account. Reload the page.'; return; }
     $('cxViewBoard').hidden = !staff;
+    document.querySelector('.cx-shell').classList.toggle('cx-without-teamboard', !hasTeamBoard);
+    document.querySelector('.cx-right').hidden = !hasTeamBoard;
+    document.querySelector('[data-bubble="task"]').hidden = !hasTeamBoard;
+    const hint = document.querySelector('.cx-hint');
+    if (!hasTeamBoard && hint) hint.textContent = staff ? 'Select text, or right-click it, to make a shot or a page' : 'Select text, or right-click it, to make a page';
     if ($('cxCoverage')) $('cxCoverage').hidden = !staff;
     if (!kit) { access.lastElementChild.textContent = 'The editor did not load. Reload the page.'; return; }
 
@@ -1136,7 +1152,7 @@
     genImage.ready.then(applyAccess);
     editor = kit.createCodexEditor({
       element: $('cxEditor'),
-      placeholder: staff ? 'Write. Type @ to mention a page. Select text to make a task or a shot.' : 'Write. Type @ to mention a page.',
+      placeholder: staff ? (hasTeamBoard ? 'Write. Type @ to mention a page. Select text to make a task or a shot.' : 'Write. Type @ to mention a page. Select text to make a shot.') : 'Write. Type @ to mention a page.',
       suggestion,
       renderBadge,
       renderShot: id => board.badge(id),

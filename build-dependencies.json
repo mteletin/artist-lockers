@@ -9,7 +9,7 @@
     {
       "repository": "ai-tlt-identity",
       "url": "https://gitlab.teletin.ro/mteletin/ai-tlt-identity.git",
-      "revision": "33c2dfad1378a70d94b8db67a3b46a0fc707c476",
+      "revision": "e537eba3a6813825cf7d6d3a377076e3ea09672a",
       "path": "../ai-tlt-identity",
       "workingTreeRequired": true,
       "note": "Base revision only. Requires the pending Accounts app-inventory/role-template changes in the shared working tree (AccountAppLink and IdentityAccountsClient.AppsAsync). Update this pin when that work is committed."

@@ -112,6 +112,7 @@
       return shot.provider === 'qwen' ? (limits.image && limits.image.model) : shot.provider === 'seevio' ? (shot.model || SD) : H3;
     }
     function modelEnabled(shot) {
+      if (limits.canGenerateLocal === false && shot.provider !== 'seevio') return false;
       const id = modelFor(shot), model = (limits.models || []).find(m => m.id === id);
       // A cloud model is on only when /limits lists it, which it does only for a user with a key.
       if (shot.provider === 'seevio') return !!model && model.enabled;
@@ -583,6 +584,7 @@
     function blocker(shot) {
       if (limitsError) return limitsError;
       if (!limits) return 'Loading the queue’s limits…';
+      if (limits.canGenerateLocal === false && shot.provider !== 'seevio') return 'Local H3 and Qwen generation requires Creator access.';
       if (!modelEnabled(shot)) return shot.provider === 'seevio'
         ? 'Enable your default Seevio key under Tools → AI zone to render on ' + providerLabel(shot) + '.'
         : providerLabel(shot) + ' is switched off right now.';

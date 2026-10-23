@@ -86,6 +86,10 @@
     {
       "source": "ai-tlt-mobvision/mv3/tools.html",
       "sha256": "fbe57d3e46ad0267b6c37f58457f683b92bdae11dc944af1a3d2aebce5d3a8f9"
+    },
+    {
+      "source": "ai-tlt-mobvision/mv3/assets/js/account-tools.js",
+      "sha256": "9ee8e83aba50570a6aedfd2abde392b660978b4116b4e6ad492944880f7603e8"
     }
   ]
 }

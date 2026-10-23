@@ -38,14 +38,16 @@ public sealed class ToolsProxy(HttpClient http, InternalActorTokenIssuer issuer,
     private const decimal SafeInteger = 9007199254740991m;
 
     /// <summary>One call as the member.</summary>
-    public Task<IResult> ActorAsync(Guid account, string scope, HttpMethod method, string path, JsonNode? body, bool slow, CancellationToken ct)
-        => SendAsync(issuer.Issue(account, scope), method, path, body, slow, ct);
+    public Task<IResult> ActorAsync(Guid account, string scope, HttpMethod method, string path, JsonNode? body, bool slow, CancellationToken ct,
+        Func<JsonNode?, JsonNode?>? transform = null)
+        => SendAsync(issuer.Issue(account, scope), method, path, body, slow, ct, transform);
 
     /// <summary>One operator call; only after the artistlockers confirmed the member may operate.</summary>
     public Task<IResult> ServiceAsync(HttpMethod method, string path, JsonNode? body, bool slow, CancellationToken ct)
         => SendAsync(issuer.Issue(OperateScope), method, path, body, slow, ct);
 
-    private async Task<IResult> SendAsync(string token, HttpMethod method, string path, JsonNode? body, bool slow, CancellationToken ct)
+    private async Task<IResult> SendAsync(string token, HttpMethod method, string path, JsonNode? body, bool slow, CancellationToken ct,
+        Func<JsonNode?, JsonNode?>? transform = null)
     {
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(ct);
         deadline.CancelAfter(slow ? slowTimeout : timeout);
@@ -59,7 +61,10 @@ public sealed class ToolsProxy(HttpClient http, InternalActorTokenIssuer issuer,
             if (response.StatusCode == HttpStatusCode.NoContent) return Results.NoContent();
             var text = await ReadAsync(response, deadline.Token);
             if (response.IsSuccessStatusCode)
-                return Results.Text(text.Length == 0 ? "{}" : Rewrite(JsonNode.Parse(text))?.ToJsonString() ?? "null", "application/json", statusCode: status);
+            {
+                var node = text.Length == 0 ? new JsonObject() : JsonNode.Parse(text);
+                return Results.Text(Rewrite(transform is null ? node : transform(node))?.ToJsonString() ?? "null", "application/json", statusCode: status);
+            }
             // The tools' role store may refuse the member even when the artistlockers's roles allow them.
             if (response.StatusCode == HttpStatusCode.Forbidden) return ApiErrors.Result(ApiErrors.ToolsForbidden);
             if (status is 400 or 404 or 409 or 503 or 507 && Refusal(text) is { } refusal)
@@ -148,7 +153,9 @@ public static class ToolsEndpoints
         var operate = app.MapGroup("/api/v1/tools/operate").RequireAuthorization(ArtistLockersHost.BrowserPolicy)
             .AddEndpointFilter((context, next) => Gate(context, next, options => options.OperatePermissions));
 
-        use.MapGet("/limits", (HttpContext http, ToolsProxy tools, CancellationToken ct) => Mine(http, tools, HttpMethod.Get, Use + "limits", ct));
+        use.MapGet("/limits", (HttpContext http, ToolsProxy tools, CancellationToken ct) =>
+            tools.ActorAsync(Caller(http).Id, ToolsProxy.UseScope, HttpMethod.Get, Use + "limits", null, false, ct,
+                node => GenerationAccess.Limits(Caller(http), node)));
         use.MapGet("/state", (HttpContext http, ToolsProxy tools, CancellationToken ct) => Mine(http, tools, HttpMethod.Get, Use + "state", ct));
         use.MapGet("/jobs", (HttpContext http, ToolsProxy tools, CancellationToken ct) => Mine(http, tools, HttpMethod.Get, Use + "jobs/mine", ct));
         use.MapGet("/jobs/shelf", (HttpContext http, ToolsProxy tools, CancellationToken ct) => Mine(http, tools, HttpMethod.Get, Use + "jobs/shelf", ct));
@@ -156,8 +163,11 @@ public static class ToolsEndpoints
             Mine(http, tools, HttpMethod.Get, Use + $"jobs/{id}", ct));
         // The owner's name on the job is the member's display name as identity has it, never one the browser chose.
         use.MapPost("/jobs", async (HttpContext http, ToolsProxy tools, CancellationToken ct) =>
-            await Mine(http, tools, HttpMethod.Post, Use + "jobs?ownerName=" + Uri.EscapeDataString(Caller(http).DisplayName), ct,
-                Seeded(await BodyAsync(http, ct))));
+        {
+            var body = await BodyAsync(http, ct);
+            if (!GenerationAccess.CanSubmit(Caller(http), body)) return ApiErrors.Result(ApiErrors.ToolsForbidden);
+            return await Mine(http, tools, HttpMethod.Post, Use + "jobs?ownerName=" + Uri.EscapeDataString(Caller(http).DisplayName), ct, Seeded(body));
+        });
         use.MapDelete("/jobs/{id:guid}", (Guid id, HttpContext http, ToolsProxy tools, CancellationToken ct) =>
             Mine(http, tools, HttpMethod.Delete, Use + $"jobs/{id}", ct));
         use.MapPost("/jobs/reorder", async (HttpContext http, ToolsProxy tools, CancellationToken ct) =>

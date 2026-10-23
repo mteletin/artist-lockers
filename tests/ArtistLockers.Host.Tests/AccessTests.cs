@@ -46,6 +46,7 @@ public sealed class AccessTests
         await using var host = await StartAsync("artistlockers:access"); host.SignIn();
         Assert.Equal(HttpStatusCode.Forbidden, (await host.Client.GetAsync("/api/v1/tools/state")).StatusCode);
         Assert.Equal(HttpStatusCode.Forbidden, (await host.Client.GetAsync("/api/codex/access")).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await host.Client.GetAsync("/api/v1/tools/remaster-jobs")).StatusCode);
         Assert.DoesNotContain(host.Peer.Calls, call => call.Path.Contains("/tools/") || call.Path.Contains("/codex/"));
     }
     [Fact]
@@ -54,9 +55,40 @@ public sealed class AccessTests
         await using var host = await StartAsync("artistlockers:access,studio:access,codex:access"); host.SignIn();
         Assert.Equal(HttpStatusCode.OK, (await host.Client.GetAsync("/api/v1/tools/limits")).StatusCode);
         Assert.Equal(HttpStatusCode.OK, (await host.Client.GetAsync("/api/codex/access")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await host.Client.GetAsync("/api/v1/tools/remaster-jobs")).StatusCode);
         foreach (var call in host.Peer.Calls.Where(call => call.Path.Contains("/tools/") || call.Path.Contains("/codex/")))
         { Assert.Equal(host.Peer.Account.Id.ToString(), call.Subject); Assert.Null(call.Cookie); }
     }
+    [Fact]
+    public async Task LocalModelsRequireExplicitGrantAndCannotBeSmuggledThroughModelCasing()
+    {
+        await using var host = await StartAsync("artistlockers:access,codex:access,studio:access"); host.SignIn();
+        host.Client.DefaultRequestHeaders.Add("X-AiTlt-Request", "1");
+        foreach (var body in new[] { "{}", "{\"model\":null}", "{\"model\":\" minimax-h3 \"}", "{\"Model\":\"qwen-image-2.1\"}", "{\"model\":\"unknown\"}" })
+        {
+            var count = host.Peer.Calls.Count(call => call.Path.EndsWith("/tools/jobs"));
+            var response = await host.Client.PostAsync("/api/v1/tools/jobs", new StringContent(body, Encoding.UTF8, "application/json"));
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+            Assert.Equal(count, host.Peer.Calls.Count(call => call.Path.EndsWith("/tools/jobs")));
+        }
+        foreach (var body in new[] { "{\"model\":\"seedance-2-5\",\"Model\":\"minimax-h3\"}", "{\"model\":42}" })
+            Assert.Equal(HttpStatusCode.BadRequest, (await host.Client.PostAsync("/api/v1/tools/jobs", new StringContent(body, Encoding.UTF8, "application/json"))).StatusCode);
+        foreach (var model in new[] { "seedance-2-5", "seedance-2-0", "seedance-2-0-fast", "seedance-2-0-mini" })
+            Assert.Equal(HttpStatusCode.OK, (await host.Client.PostAsJsonAsync("/api/v1/tools/jobs", new { Model = model })).StatusCode);
+        Assert.All(host.Peer.Calls.Where(call => call.Path.EndsWith("/tools/jobs")), call => Assert.Equal(host.Peer.Account.Id.ToString(), call.Subject));
+        using var limits = await host.Client.GetFromJsonAsync<JsonDocument>("/api/v1/tools/limits");
+        Assert.False(limits!.RootElement.GetProperty("canGenerateLocal").GetBoolean());
+        Assert.Equal(JsonValueKind.Null, limits.RootElement.GetProperty("image").ValueKind);
+        var models = limits.RootElement.GetProperty("models").EnumerateArray().ToArray();
+        Assert.False(models.Single(m => m.GetProperty("id").GetString() == "minimax-h3").GetProperty("enabled").GetBoolean());
+        Assert.True(models.Single(m => m.GetProperty("id").GetString() == "seedance-2-5").GetProperty("enabled").GetBoolean());
+        // Revocation is effective on the next request; role names and browser-selected models cannot bypass it.
+        host.Peer.Account = host.Peer.Account with { Permissions = ["artistlockers:access", "studio:access", "studio:generate_local"] };
+        Assert.Equal(HttpStatusCode.OK, (await host.Client.PostAsJsonAsync("/api/v1/tools/jobs", new { model = "qwen-image-2.1" })).StatusCode);
+        host.Peer.Account = host.Peer.Account with { Permissions = ["artistlockers:access", "studio:access"] };
+        Assert.Equal(HttpStatusCode.Forbidden, (await host.Client.PostAsJsonAsync("/api/v1/tools/jobs", new { model = "qwen-image-2.1" })).StatusCode);
+    }
+
     [Fact]
     public async Task ProfileWritesDelegateTheSessionOwnerAndKeepCsrfBoundary()
     {
@@ -113,13 +145,43 @@ public sealed class AccessTests
         Assert.Equal(HttpStatusCode.Redirect, (await host.Client.GetAsync(path)).StatusCode);
         host.SignIn(); Assert.Equal(HttpStatusCode.Forbidden, (await host.Client.GetAsync(path)).StatusCode);
     }
-    private static async Task<Host> StartAsync(string grants = "artistlockers:access")
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task TeamBoardRequiresProductComponentEvenWhenTheMemberHasBoardRights(bool included)
+    {
+        await using var host = await StartAsync("artistlockers:access,codex:access,teamboard:access,teamboard:manage", included); host.SignIn();
+        host.Client.DefaultRequestHeaders.Add("X-AiTlt-Request", "1");
+        using var me = await host.Client.GetFromJsonAsync<JsonDocument>("/api/v1/me");
+        Assert.Equal(included, me!.RootElement.GetProperty("components").EnumerateArray().Any(component => component.GetString() == "teamboard"));
+        foreach (var path in new[] { "/api/codex/team", "/api/codex/pages/" + Guid.NewGuid() + "/anchors" })
+            Assert.Equal(included ? HttpStatusCode.OK : HttpStatusCode.NotFound, (await host.Client.GetAsync(path)).StatusCode);
+        Assert.Equal(included ? HttpStatusCode.OK : HttpStatusCode.NotFound,
+            (await host.Client.PostAsJsonAsync("/api/codex/pages/" + Guid.NewGuid() + "/tasks", new { title = "Task" })).StatusCode);
+        if (!included) Assert.DoesNotContain(host.Peer.Calls, call => call.Path.Contains("/codex/"));
+    }
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task AppSwitcherIsOnlyOfferedToTheConfiguredOperatorWithAccountsRights(bool configured, bool admin)
+    {
+        await using var host = await StartAsync("artistlockers:access" + (admin ? ",accounts:manage" : ""), appSwitcher: configured); host.SignIn();
+        using var me = await host.Client.GetFromJsonAsync<JsonDocument>("/api/v1/me");
+        Assert.Equal(configured && admin, me!.RootElement.GetProperty("canSwitchApps").GetBoolean());
+        Assert.Equal(configured && admin, host.Peer.Calls.Any(call => call.Path.EndsWith("/apps")));
+        if (!(configured && admin)) Assert.Empty(me.RootElement.GetProperty("apps").EnumerateArray());
+    }
+    private static async Task<Host> StartAsync(string grants = "artistlockers:access", bool teamBoard = false, bool appSwitcher = false)
     {
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions { EnvironmentName = "Development", ContentRootPath = AppContext.BaseDirectory });
         builder.WebHost.UseUrls("http://127.0.0.1:0"); builder.Logging.ClearProviders();
         var peer = new Peer(grants.Split(',', StringSplitOptions.RemoveEmptyEntries));
         using var rsa = RSA.Create(2048); var privateKey = rsa.ExportPkcs8PrivateKeyPem();
         var settings = new Dictionary<string,string?> { ["ArtistLockers:AccountCacheSeconds"] = "0" };
+        if (teamBoard) settings["ArtistLockers:Components:4"] = "teamboard";
+        if (appSwitcher) settings["ArtistLockers:AppSwitcherAccountIds:0"] = peer.Account.Id.ToString();
         foreach (var (name,audience) in new[] { ("Identity","identity"), ("Gallery","gallery"), ("Tools","tools"), ("Codex","codex") })
         {
             settings[name+":BaseUrl"]="https://"+name.ToLowerInvariant()+".test/";
@@ -150,7 +212,9 @@ public sealed class AccessTests
             object body=request.RequestUri.AbsolutePath.EndsWith("/apps")?Array.Empty<AccountAppLink>():
                 request.RequestUri.AbsolutePath.StartsWith("/internal/v1/accounts/")?Account:
                 request.RequestUri.AbsolutePath=="/internal/v1/profiles/me"?new { accountId=Account.Id,name="Creator",slug="creator",country="",bio="",themeId="default",imageUrl=(string?)null }:
-                request.RequestUri.AbsolutePath.EndsWith("/access")?new { allowed=true,staff=false }:new { models=Array.Empty<object>(),items=Array.Empty<object>() };
+                request.RequestUri.AbsolutePath.EndsWith("/access")?new { allowed=true,staff=false }:
+                request.RequestUri.AbsolutePath.EndsWith("/tools/limits")?new { models=new[] {new { id="minimax-h3",enabled=true },new { id="seedance-2-5",enabled=true }}, image=new {model="qwen-image-2.1"} }:
+                new { models=Array.Empty<object>(),items=Array.Empty<object>() };
             return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content=JsonContent.Create(body) });
         }
     }

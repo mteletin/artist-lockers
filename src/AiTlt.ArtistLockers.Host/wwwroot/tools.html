@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="assets/css/account-h3.css?v=20260930-extend-plus-1">
 <script src="assets/js/asset-picker.js?v=20260929-picker-1" defer></script>
 <script src="assets/js/confirm-dialog.js?v=20260807-confirm-1" defer></script>
+<script src="assets/js/account-tools.js" defer></script>
 <script src="assets/js/account-tools-tabs.js?v=20261001-tools-page-1" defer></script>
 <script src="assets/js/gen-models.js?v=20260930-models-1" defer></script>
 <script src="assets/js/account-gen-shared.js?v=20261022-permissions-1" defer></script>
@@ -40,6 +41,7 @@
       <div class="tools-subtabs" id="toolsSubtabs" role="tablist" aria-label="Tools">
         <button class="tools-subtab" type="button" data-tool="h3" role="tab" aria-selected="false" hidden>Video Generation</button>
         <button class="tools-subtab" type="button" data-tool="image" role="tab" aria-selected="false" hidden>Image Generator</button>
+        <button class="tools-subtab" type="button" data-tool="remaster" role="tab" aria-selected="false">Audio Remaster</button>
         <button class="tools-subtab" type="button" data-tool="ai" role="tab" aria-selected="false" hidden>AI zone</button>
       </div>
 
@@ -388,6 +390,42 @@
             </div>
             <div class="h3-shelf" id="imgShelf"></div>
           </section>
+        </div>
+      </section>
+      </div>
+
+      <div class="tools-subpanel is-visible" id="toolsPanelRemaster" data-tool-panel="remaster">
+      <div class="account-subhead">
+        <span class="account-status" id="toolsStatus" role="status"></span>
+      </div>
+
+      <section class="tools-hero" aria-labelledby="remasterToolTitle">
+        <div class="tools-hero-copy">
+          <div class="tools-kicker">Audio tool</div>
+          <h2 id="remasterToolTitle">Audio Remaster</h2>
+          <p>Upload an MP3 or WAV, join the shared render queue, and download your remastered result when processing completes.</p>
+        </div>
+        <form class="tools-upload-card" id="remasterUploadForm">
+          <label class="tools-file-drop" for="remasterAudioFile">
+            <span class="tools-file-label">Source audio</span>
+            <strong id="remasterFileName">Choose MP3 or WAV</strong>
+            <small>Maximum 100MB. Files are private to your account and expire after 7 days.</small>
+          </label>
+          <input id="remasterAudioFile" name="audioFile" type="file" accept=".mp3,.wav,audio/mpeg,audio/mp3,audio/wav,audio/x-wav">
+          <button class="btn-primary tools-submit" id="remasterUploadButton" type="submit">Queue remaster</button>
+        </form>
+      </section>
+
+      <section class="tools-queue-panel" aria-labelledby="remasterQueueTitle">
+        <div class="tools-section-head">
+          <div>
+            <div class="tools-kicker">Your queue</div>
+            <h3 id="remasterQueueTitle">Remaster Jobs</h3>
+          </div>
+          <button class="btn-secondary" id="remasterRefreshButton" type="button">Refresh</button>
+        </div>
+        <div class="tools-job-list" id="remasterJobsList">
+          <div class="admin-empty">Remaster jobs will appear here.</div>
         </div>
       </section>
       </div>
