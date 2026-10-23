@@ -1,12 +1,12 @@
-# AI-TLT Artist Lockers
+# Artist Lockers
 
-The creator product at https://artistlockers.eu, with its own host and square silver/clay UI. Uses the existing AI-TLT identity, creator profiles, Gallery, generation and Codex services. No contest or copied user content.
+Artist Lockers is a creative workspace with a minimalist silver/clay interface: profiles, a media Gallery, creative Tools and the Codex editor.
 
-The first slice contains Profile, Gallery, Tools and the complete Mobvision Codex editor port. Locker and Exposition are labelled placeholders. See the [product brief](docs/product-and-first-slice.md) and [deployment runbook/status](docs/deployment.md), including the Audio Remaster boundary.
+This repository includes everything needed to develop the UI locally with fictional data and simulated interactions. Locker and Exposition are currently labelled placeholders.
 
 ## Develop the UI on its own
 
-Clone **only this repository**, install Node.js 22 or later, and run:
+Install Node.js 22 or later, then clone this repository and run:
 
 ```sh
 git clone https://github.com/mteletin/artist-lockers.git
@@ -14,8 +14,8 @@ cd artist-lockers
 npm run dev
 ```
 
-Open **http://127.0.0.1:5088**. No `npm install`, .NET SDK, sibling repositories, database, credentials, or running AI-TLT
-services are needed. The mock host serves the real UI files directly; edit HTML/CSS/JavaScript under
+Open **http://127.0.0.1:5088**. Node.js is all you need; no `npm install` is required.
+The mock host serves the real UI files directly; edit HTML/CSS/JavaScript under
 `src/AiTlt.ArtistLockers.Host/wwwroot` and refresh the browser.
 
 The **DEMO** badge opens developer controls for Member, Creator, Administrator, signed-out, empty and error scenarios,
@@ -34,7 +34,7 @@ npm run test:dev
 
 | Area | Available locally |
 | --- | --- |
-| Sign-in/out | Simulated browser session; no Discord or Accounts connection |
+| Sign-in/out | Simulated local browser session |
 | Profile | Edit/save your profile, create/edit/archive artists and personas, and link personas |
 | Gallery | Own/shared media, metadata, tags, uploads, sharing, deletion and frame saves |
 | Media | Fictional SVG artwork, playable sample video and WAV audio |
@@ -49,7 +49,7 @@ Open the **DEMO** badge or **http://127.0.0.1:5088/__dev** to change the current
 
 - **Member:** Profile, Gallery, full Codex and personal-key tools. Add `demo-seevio-key` in Tools → AI zone to reveal cloud video models.
 - **Creator** (default): Member features plus local H3 and Qwen generation.
-- **Administrator:** Creator experience plus product administration; shared-service operations and the super-admin app switcher stay unavailable.
+- **Administrator:** Creator experience plus product administration.
 - **Signed out:** The minimal landing and local sign-in flow.
 
 The controls also let you reset fictional data, simulate API failures, add up to two seconds of latency and inspect recent
@@ -65,8 +65,7 @@ There is no real OAuth, AI generation, remaster processing, billing, publishing 
 provider or production service. Use fictional `demo-` keys only. Locker and Exposition remain the product's labelled placeholders;
 advanced cut exports and unsupported API routes return explicit errors rather than pretending to work.
 
-The mock server binds **only to loopback**. Use browser device emulation for mobile layouts. It is separate from the production
-.NET application and is not included in its deployment; this is not a production authentication-bypass switch.
+The mock server binds **only to loopback**. Use browser device emulation for mobile layouts.
 
 ### Editing and verification
 
@@ -93,27 +92,3 @@ existing Playwright package, `ARTISTLOCKERS_BROWSER` to select another installed
 `ARTISTLOCKERS_SCREENSHOTS` to change the output directory.
 
 If port 5088 is busy, run `npm run dev -- --port 5090`. See [UI development](docs/ui-development.md) for additional details.
-
-## Run the integration host
-
-The production .NET host requires sibling `ai-tlt-platform` and `ai-tlt-identity` checkouts. .NET 10 is the target runtime;
-`build-dependencies.json` records the tested revisions. This is separate from the dependency-free UI workflow above.
-
-```powershell
-dotnet build src/AiTlt.ArtistLockers.Host
-dotnet test tests/ArtistLockers.Host.Tests
-```
-
-Start with `appsettings.example.json` and supply private settings outside source control. An empty local host cannot authenticate against production until its own signing keys are registered. Never copy another product's signing identity.
-
-## Access
-
-Accounts assignment supplies `artistlockers:access` (or `manage`). Tools additionally requires `studio:access`; Codex requires `codex:access`; generation inside Codex additionally requires Studio. Tool operations require `studio:manage`. The host revalidates current Accounts state and derives every delegated user identity from the signed-in session. Role names never authorize requests.
-
-Browser checks use Playwright Chromium and synthetic services:
-
-```powershell
-node tests/browser/check.cjs
-```
-
-Install Playwright in the environment, or set `PLAYWRIGHT_PACKAGE` to an existing package location. Screenshots go into ignored `artifacts/browser/` (override with `ARTISTLOCKERS_SCREENSHOTS`). The check covers anonymous landing, profile dialog/save, Gallery Repeat handoff, a generation request with an exact large seed, Codex creation/autosave, and desktop/mobile layouts. It never signs into or writes to production.

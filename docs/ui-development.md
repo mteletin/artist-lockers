@@ -1,7 +1,6 @@
-# UI development without the platform
+# Standalone UI development
 
-The mock host in `dev/` serves the application's actual `wwwroot` with synthetic APIs. It is an independent Node.js
-process, not a production authentication bypass or an environment flag in the .NET application. It needs only this
+The mock host in `dev/` serves the application's actual `wwwroot` with synthetic APIs. It needs only this
 repository and Node.js 22+. Its runtime imports are all Node built-ins; there are no npm dependencies to install.
 
 ## Start
@@ -22,7 +21,7 @@ npm run dev -- --delay 1200
 ```
 
 Supported personas are `member`, `creator`, `administrator`, and `signed-out`. Administrator combines the Creator
-experience with product administration; it does not grant shared-service operations or the super-admin app switcher.
+experience with product administration.
 The Member/Creator difference is local H3/Qwen generation. Both can use Codex, Gallery, Profile and personal-key tools.
 
 The **DEMO** badge, or http://127.0.0.1:5088/__dev, opens controls for persona, scenario, latency and reset. The controls
@@ -35,7 +34,7 @@ The host binds to loopback only and refuses external Host headers and cross-orig
 
 | UI area | Mock behavior |
 | --- | --- |
-| Sign-in/out | Local session only; no Discord, OAuth or Accounts calls |
+| Sign-in/out | Simulated local browser session |
 | Profile | Edit/save a fictional profile; create/edit/archive artists/personas; link personas |
 | Gallery | Own/shared libraries, tags, media metadata, uploads, sharing, deletion and saved frames |
 | Media viewers | Bundled geometric SVG studies, a generated four-second MP4 and a generated WAV; byte-range playback |
@@ -45,12 +44,12 @@ The host binds to loopback only and refuses external Host headers and cross-orig
 | Empty/error/loading states | Empty media/documents, simulated API failures, 0–2000 ms response latency |
 | Locker / Exposition | The same labelled placeholders as the current product |
 
-This is UI data, not real AI generation or DSP. No provider, external URL, signing key, database, worker or production
-service is contacted by the mock host. In AI zone enter a **fictional** key beginning with `demo-`, such as
+All responses are synthetic; the mock host makes no remote calls or real AI generation or audio processing requests.
+In AI zone enter a **fictional** key beginning with `demo-`, such as
 `demo-seevio-key`. Only its label/last-four metadata is retained. Member mode reveals cloud video models after an
 enabled default demo key is added; local H3/Qwen remains unavailable.
 
-The mock implements the common UI flows above, not every platform contract. Advanced cut exports, real collaboration,
+The mock implements the common UI flows above. Advanced cut exports, real collaboration,
 provider billing and publish workflows are not executed. An unknown API route returns an explicit 404 rather than a
 success-shaped empty response: implement its fixture before using it to validate a new feature.
 
@@ -77,12 +76,8 @@ also resets the in-memory data.
 | `dev/server.mjs` | Loopback HTTP server, static files, local sessions, uploads and media responses |
 | `dev/controls.html`, `dev/banner.js` | Local-only scenario controls and the DEMO badge |
 
-For a new UI call, add the fixture response/mutation in `dev/api.mjs` and match the owned backend contract. Then test
-the UI against both mock and real integration services as appropriate. Passing a mock check does not prove backend
-authorization, integration correctness or real AI quality.
-
-The .NET publish/deployment uses the host project under `src/`; it does not ship or start `dev/server.mjs`. Production
-entry points and their authentication remain unchanged.
+For a new UI call, add the fixture response or mutation in `dev/api.mjs` with the shape the UI expects, then exercise
+the populated, empty and error states. Mock checks validate local UI behavior; they do not verify real AI output.
 
 ## Checks
 
@@ -108,5 +103,4 @@ the default `artifacts/dev-host` is ignored by Git. Browser checks start/stop th
 port and refuse external requests. The existing `tests/browser/check.cjs` remains the detailed synthetic layout suite.
 
 If the port is busy, use `npm run dev -- --port 5090`. If a page is stuck in an outage or signed-out state, open
-`/__dev` and reset. If real integration services are needed, follow the separate .NET instructions in the README
-and deployment runbook; the mock host deliberately has no connection settings for them.
+`/__dev` and reset.
