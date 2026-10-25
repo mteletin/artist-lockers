@@ -194,6 +194,7 @@ public static class ArtistLockersHost
         remaster.MapDelete("/{id:guid}",(Guid id,HttpContext http,ArtistRemaster proxy)=>proxy.ForwardAsync(http,SignedIn(http)!.Id,"/"+id));
         remaster.MapGet("/{id:guid}/result",(Guid id,HttpContext http,ArtistRemaster proxy)=>proxy.ForwardAsync(http,SignedIn(http)!.Id,"/"+id+"/result"));
         app.MapMediaProxy();
+        AiTlt.Assets.Http.SignedAssetReferences.MapSignedAssetReferences(app, app.Configuration["Seevio:RefSigningKey"]);
 
         // The UI routes by hash, but a deep link to any other page path still gets the app; API paths keep their 404.
         var index = app.Environment.WebRootFileProvider.GetFileInfo("index.html");
